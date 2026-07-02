@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: sticky-burgers-backend
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+# Configuración común de la aplicación
+sticky:
+  # Precio del medallón extra por unidad de línea (en pesos)
+  medallon-precio: 3500
+  # Radio máximo de reparto en km
+  delivery:
+    radio-max-km: 3
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:sticky}
+    username: ${DB_USER:sticky}
+    password: ${DB_PASSWORD:sticky}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT:5432}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+  flyway:
+    enabled: true
