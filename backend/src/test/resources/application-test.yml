@@ -16,3 +16,9 @@ sticky:
   medallon-precio: 3500
   delivery:
     radio-max-km: 3
+  jwt:
+    secret: dGVzdC1zZWNyZXQtc3RpY2t5LWJ1cmdlcnMtMjU2LWJpdHMtbWluaW11bS1sZW5ndGgtb2s
+    expiration-ms: 3600000
+  admin:
+    username: admin
+    password: admin123
