@@ -1,0 +1,7 @@
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:#050403;font-family:'Oswald',sans-serif;color:#f3ece0;-webkit-font-smoothing:antialiased}
+input,textarea,button,select{font-family:inherit;outline:none}
+input::placeholder,textarea::placeholder{color:#5f5850}
+::-webkit-scrollbar{width:0;height:0}
+#app{min-height:100vh;display:flex;justify-content:center;align-items:stretch;background:#050403;background-image:repeating-linear-gradient(135deg,#0d0c0a 0 20px,#090807 20px 40px)}
