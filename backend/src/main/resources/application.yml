@@ -11,6 +11,16 @@ sticky:
   # Radio máximo de reparto en km
   delivery:
     radio-max-km: 3
+  # Autenticación admin (JWT)
+  jwt:
+    # Secreto HMAC. Sobreescribir en prod vía variable de entorno JWT_SECRET.
+    secret: ${JWT_SECRET:ZmFsbGJhY2stZGV2LXNlY3JldC1jaGFuZ2UtbWUtc3RpY2t5LWJ1cmdlcnMtMjU2Yml0c30}
+    # Expiración del token en milisegundos (8 horas)
+    expiration-ms: ${JWT_EXPIRATION_MS:28800000}
+  # Credenciales del admin sembrado al iniciar (si no existe)
+  admin:
+    username: ${ADMIN_USERNAME:admin}
+    password: ${ADMIN_PASSWORD:admin123}
 
 springdoc:
   swagger-ui:
