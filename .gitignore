@@ -1,0 +1,39 @@
+# ===== Java / Maven =====
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+*.war
+*.log
+hs_err_pid*
+replay_pid*
+
+# ===== Spring Boot =====
+*.original
+application-local.yml
+application-local.properties
+
+# ===== Node / Angular (futuro frontend) =====
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+yarn-error.log*
+
+# ===== Entorno =====
+.env
+.env.*
+!.env.example
+
+# ===== IDE =====
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+nbproject/
+
+# ===== SO =====
+.DS_Store
+Thumbs.db
