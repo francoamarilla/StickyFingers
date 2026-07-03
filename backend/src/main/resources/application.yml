@@ -8,9 +8,11 @@ spring:
 sticky:
   # Precio del medallón extra por unidad de línea (en pesos)
   medallon-precio: 3500
-  # Radio máximo de reparto en km
+  # Radio máximo de reparto en km y ubicación del local (Buenos Aires 1058, Córdoba Capital)
   delivery:
     radio-max-km: 3
+    origen-lat: -31.4265
+    origen-lng: -64.1888
   # Autenticación admin (JWT)
   jwt:
     # Secreto HMAC. Sobreescribir en prod vía variable de entorno JWT_SECRET.

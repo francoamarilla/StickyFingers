@@ -19,15 +19,18 @@
       </div>
 
       @if (esDelivery()) {
-        <input class="in" placeholder="Dirección (calle y número)" [ngModel]="direccion()" (ngModelChange)="direccion.set($event)" />
-        <label class="lluvia">
-          <input type="checkbox" [ngModel]="lluvia()" (ngModelChange)="lluvia.set($event)" />
-          Está lloviendo (afecta el envío)
-        </label>
-        @if (direccion().trim()) {
+        <input class="in" placeholder="Dirección (calle y número)" [ngModel]="direccion()" (ngModelChange)="onDireccion($event)" />
+        @if (lluvia()) {
+          <p class="lluvia-aviso">☔ Está lloviendo: el envío tiene un recargo.</p>
+        }
+        @if (geoEstado() === 'buscando') {
+          <p class="warn">Buscando la dirección…</p>
+        } @else if (geoEstado() === 'no-encontrada') {
+          <p class="warn">No pudimos ubicar esa dirección. Revisá calle y número (Córdoba Capital).</p>
+        } @else if (geoEstado() === 'ok') {
           <div class="envio-box">
             <div class="fila">
-              <span>Distancia estimada</span>
+              <span>Distancia</span>
               <span class="val">{{ km() }} km</span>
             </div>
             <div class="fila total-fila">

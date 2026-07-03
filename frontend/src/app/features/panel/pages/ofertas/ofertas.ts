@@ -4,6 +4,18 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { OfertaService } from '../../../../core/services/oferta.service';
 import { Oferta, OfertaRequest } from '../../../../core/models/oferta.model';
 import { MoneyPipe } from '../../../../shared/money.pipe';
+import { descargarImagenOferta } from './oferta-imagen.util';
+
+/** "18000" -> "$18.000" para mostrar en el input. */
+function formatMoneda(n: number | null): string {
+  return n ? '$' + n.toLocaleString('es-AR') : '';
+}
+
+/** Extrae el número de un texto con formato moneda ("$18.000" -> 18000). */
+function parseMoneda(texto: string): number | null {
+  const digitos = texto.replace(/\D/g, '');
+  return digitos ? Number(digitos) : null;
+}
 
 @Component({
   selector: 'app-ofertas',
@@ -21,8 +33,21 @@ export class Ofertas {
   readonly titulo = signal('');
   readonly descripcion = signal('');
   readonly precio = signal<number | null>(null);
+  readonly precioTexto = signal('');
   readonly vigencia = signal('Solo hoy');
   readonly activa = signal(true);
+
+  onPrecio(texto: string): void {
+    const n = parseMoneda(texto);
+    this.precio.set(n);
+    this.precioTexto.set(formatMoneda(n));
+  }
+
+  descargarImagen(o: Oferta): void {
+    descargarImagenOferta(o).catch(() =>
+      this.snack.open('No se pudo generar la imagen', 'OK', { duration: 3000 }),
+    );
+  }
 
   constructor() {
     this.cargar();
@@ -37,6 +62,7 @@ export class Ofertas {
     this.titulo.set(o.titulo);
     this.descripcion.set(o.descripcion ?? '');
     this.precio.set(o.precio);
+    this.precioTexto.set(formatMoneda(o.precio));
     this.vigencia.set(o.vigencia ?? '');
     this.activa.set(o.activa);
   }
@@ -46,6 +72,7 @@ export class Ofertas {
     this.titulo.set('');
     this.descripcion.set('');
     this.precio.set(null);
+    this.precioTexto.set('');
     this.vigencia.set('Solo hoy');
     this.activa.set(true);
   }

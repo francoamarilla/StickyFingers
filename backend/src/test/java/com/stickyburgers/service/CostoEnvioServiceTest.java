@@ -16,7 +16,7 @@ class CostoEnvioServiceTest {
 
     private final CostoEnvioService service = new CostoEnvioService(
             new StickyProperties(3500,
-                    new StickyProperties.Delivery(3),
+                    new StickyProperties.Delivery(3, -31.4265, -64.1888),
                     new StickyProperties.Jwt("x".repeat(40), 3600000),
                     new StickyProperties.Admin("admin", "admin123")));
 

@@ -10,7 +10,7 @@ public record StickyProperties(
         Jwt jwt,
         Admin admin
 ) {
-    public record Delivery(Integer radioMaxKm) {}
+    public record Delivery(Integer radioMaxKm, Double origenLat, Double origenLng) {}
 
     public record Jwt(String secret, long expirationMs) {}
 

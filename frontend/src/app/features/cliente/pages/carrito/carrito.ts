@@ -22,7 +22,7 @@ export class Carrito {
   );
 
   incrementar(line: CartLine): void {
-    if (line.producto.tipo === 'HAMBURGUESA' && this.cart.cantidadHamburguesas() >= MAX_HAMBURGUESAS) {
+    if (line.tipo === 'HAMBURGUESA' && this.cart.cantidadHamburguesas() >= MAX_HAMBURGUESAS) {
       this.snack.open(`Máximo ${MAX_HAMBURGUESAS} hamburguesas por pedido`, 'OK', { duration: 2500 });
       return;
     }

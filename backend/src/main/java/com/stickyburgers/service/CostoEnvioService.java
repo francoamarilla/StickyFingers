@@ -17,11 +17,33 @@ public class CostoEnvioService {
 
     private static final BigDecimal T1 = new BigDecimal("2");
     private static final BigDecimal T2 = new BigDecimal("2.5");
+    private static final double RADIO_TIERRA_KM = 6371.0;
 
     private final BigDecimal radioMaxKm;
+    private final double origenLat;
+    private final double origenLng;
 
     public CostoEnvioService(StickyProperties props) {
         this.radioMaxKm = new BigDecimal(props.delivery().radioMaxKm());
+        this.origenLat = props.delivery().origenLat();
+        this.origenLng = props.delivery().origenLng();
+    }
+
+    /**
+     * Distancia en km entre el local y las coordenadas del cliente (fórmula de Haversine).
+     * @throws ReglaNegocioException si faltan las coordenadas.
+     */
+    public BigDecimal haversineKm(BigDecimal lat, BigDecimal lng) {
+        if (lat == null || lng == null) {
+            throw new ReglaNegocioException("Las coordenadas de la dirección son obligatorias para delivery");
+        }
+        double dLat = Math.toRadians(lat.doubleValue() - origenLat);
+        double dLng = Math.toRadians(lng.doubleValue() - origenLng);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(origenLat)) * Math.cos(Math.toRadians(lat.doubleValue()))
+                * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return BigDecimal.valueOf(RADIO_TIERRA_KM * c).setScale(2, java.math.RoundingMode.HALF_UP);
     }
 
     /**

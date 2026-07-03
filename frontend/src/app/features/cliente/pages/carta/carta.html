@@ -19,6 +19,28 @@
       <b>{{ maxHamburguesas }} hamburguesas</b> por pedido.
     </div>
 
+    @if (ofertas().length > 0) {
+      <h2 class="seccion ofertas-tit font-anton">🔥 OFERTAS</h2>
+      <div class="lista">
+        @for (o of ofertas(); track o.id) {
+          <article class="card oferta">
+            <div class="row">
+              <h3 class="font-anton">{{ o.titulo }}</h3>
+              <span class="precio">{{ o.precio | money }}</span>
+            </div>
+            @if (o.descripcion) { <p class="desc">{{ o.descripcion }}</p> }
+            <div class="acciones">
+              @if (o.vigencia) { <span class="vig">{{ o.vigencia }}</span> }
+              @if (cantidadOfertaEnPedido(o) > 0) {
+                <span class="en-pedido">{{ cantidadOfertaEnPedido(o) }} en pedido</span>
+              }
+              <button type="button" class="add" (click)="agregarOferta(o)">AGREGAR +</button>
+            </div>
+          </article>
+        }
+      </div>
+    }
+
     <h2 class="seccion font-anton">HAMBURGUESAS</h2>
     <div class="lista">
       @for (b of hamburguesas(); track b.id) {
