@@ -1,0 +1,64 @@
+@use '@angular/material' as mat;
+
+html {
+  height: 100%;
+  color-scheme: dark;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$red-palette,
+        tertiary: mat.$yellow-palette,
+      ),
+      typography: Oswald,
+      density: 0,
+    )
+  );
+}
+
+:root {
+  --sticky-bg: #0b0a09;
+  --sticky-surface: #161311;
+  --sticky-surface-2: #1a1613;
+  --sticky-red: #e11b22;
+  --sticky-yellow: #ffc400;
+  --sticky-cream: #f3ece0;
+  --sticky-muted: #9a9186;
+  --sticky-dim: #6f6860;
+  --sticky-border: rgba(255, 255, 255, 0.08);
+  --sticky-green: #39b34a;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  background-color: var(--sticky-bg);
+  color: var(--sticky-cream);
+  font-family: 'Oswald', system-ui, sans-serif;
+  font-weight: 300;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.font-anton {
+  font-family: 'Anton', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+/* Diálogo de Material con fondo oscuro de marca */
+.sticky-dialog .mat-mdc-dialog-surface {
+  background: var(--sticky-bg);
+  border: 1px solid var(--sticky-border);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+/* Scrollbar sutil */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}

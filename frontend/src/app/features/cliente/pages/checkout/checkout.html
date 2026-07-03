@@ -1,0 +1,80 @@
+<div class="page">
+  <header class="topbar">
+    <button type="button" class="back" (click)="volver()" aria-label="Volver">‹</button>
+    <h1 class="font-anton">FINALIZAR</h1>
+  </header>
+
+  <main>
+    <section>
+      <h2 class="label font-anton">TUS DATOS</h2>
+      <input class="in" placeholder="Nombre y apellido" [ngModel]="nombre()" (ngModelChange)="nombre.set($event)" />
+      <input class="in" inputmode="numeric" placeholder="Teléfono / WhatsApp" [ngModel]="telefono()" (ngModelChange)="telefono.set($event)" />
+    </section>
+
+    <section>
+      <h2 class="label font-anton">ENTREGA</h2>
+      <div class="seg">
+        <button type="button" [class.on]="!esDelivery()" (click)="setEntrega('RETIRO')">Retiro en local</button>
+        <button type="button" [class.on]="esDelivery()" (click)="setEntrega('DELIVERY')">Delivery</button>
+      </div>
+
+      @if (esDelivery()) {
+        <input class="in" placeholder="Dirección (calle y número)" [ngModel]="direccion()" (ngModelChange)="direccion.set($event)" />
+        <label class="lluvia">
+          <input type="checkbox" [ngModel]="lluvia()" (ngModelChange)="lluvia.set($event)" />
+          Está lloviendo (afecta el envío)
+        </label>
+        @if (direccion().trim()) {
+          <div class="envio-box">
+            <div class="fila">
+              <span>Distancia estimada</span>
+              <span class="val">{{ km() }} km</span>
+            </div>
+            <div class="fila total-fila">
+              <span>Costo de envío</span>
+              @if (fueraRadio()) {
+                <span class="fuera">Fuera de radio</span>
+              } @else {
+                <span class="val">{{ costoEnvio() | money }}</span>
+              }
+            </div>
+          </div>
+          @if (fueraRadio()) {
+            <p class="warn">Esa dirección queda fuera del radio de reparto (máx. 3 km). Probá otra o elegí retiro.</p>
+          }
+        }
+      }
+    </section>
+
+    <section>
+      <h2 class="label font-anton">PAGO</h2>
+      <div class="seg">
+        <button type="button" [class.on]="medioPago() === 'EFECTIVO'" (click)="setPago('EFECTIVO')">Efectivo</button>
+        <button type="button" [class.on]="medioPago() === 'TRANSFERENCIA'" (click)="setPago('TRANSFERENCIA')">Transferencia</button>
+      </div>
+      <p class="nota-pago">Sin recargo por medio de pago.</p>
+    </section>
+
+    <section>
+      <h2 class="label font-anton">NOTA GENERAL</h2>
+      <textarea class="in" rows="2" placeholder="Horario deseado, referencias del domicilio, etc." [ngModel]="notaGeneral()" (ngModelChange)="notaGeneral.set($event)"></textarea>
+    </section>
+
+    <div class="resumen">
+      <div class="fila"><span>Subtotal</span><span>{{ cart.subtotal() | money }}</span></div>
+      @if (esDelivery() && !fueraRadio()) {
+        <div class="fila"><span>Envío</span><span>{{ costoEnvio() | money }}</span></div>
+      }
+      <div class="fila total">
+        <span class="font-anton">TOTAL</span>
+        <span class="font-anton monto">{{ total() | money }}</span>
+      </div>
+    </div>
+  </main>
+
+  <footer class="barra">
+    <button type="button" class="cta font-anton" [disabled]="!puedeConfirmar()" (click)="confirmar()">
+      {{ enviando() ? 'ENVIANDO…' : 'CONFIRMAR PEDIDO · ' + (total() | money) }}
+    </button>
+  </footer>
+</div>

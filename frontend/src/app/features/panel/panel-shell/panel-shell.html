@@ -1,0 +1,17 @@
+<div class="shell">
+  <header class="topbar">
+    <img src="logo.png" alt="Sticky Burgers" class="logo" />
+    <span class="title font-anton">PANEL DEL LOCAL</span>
+    <button type="button" class="salir" (click)="salir()">Salir</button>
+  </header>
+
+  <nav class="tabs">
+    <a routerLink="pedidos" routerLinkActive="on">Pedidos</a>
+    <a routerLink="ofertas" routerLinkActive="on">Ofertas</a>
+    <a routerLink="informes" routerLinkActive="on">Informes</a>
+  </nav>
+
+  <main>
+    <router-outlet />
+  </main>
+</div>

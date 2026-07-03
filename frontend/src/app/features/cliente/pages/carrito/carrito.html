@@ -1,0 +1,57 @@
+<div class="page">
+  <header class="topbar">
+    <button type="button" class="back" (click)="volver()" aria-label="Volver">‹</button>
+    <h1 class="font-anton">TU PEDIDO</h1>
+  </header>
+
+  <main>
+    @if (cart.vacio()) {
+      <div class="empty">
+        <div class="icon">🛒</div>
+        <p>Tu pedido está vacío.</p>
+        <button type="button" class="ghost" (click)="volver()">VER LA CARTA</button>
+      </div>
+    } @else {
+      <div class="progreso">
+        <span>{{ cart.cantidadHamburguesas() }} de {{ maxHamburguesas }} hamburguesas</span>
+        <div class="bar"><div class="fill" [style.width.%]="progreso()"></div></div>
+      </div>
+
+      <div class="lista">
+        @for (l of cart.lines(); track l.lineId) {
+          <article class="card">
+            <div class="row">
+              <h3 class="font-anton">{{ l.producto.nombre }}</h3>
+              <button type="button" class="x" (click)="quitar(l)" aria-label="Quitar">✕</button>
+            </div>
+            <div class="row2">
+              <div class="stepper">
+                <button type="button" (click)="decrementar(l)" aria-label="Menos">–</button>
+                <span class="qty">{{ l.cantidad }}</span>
+                <button type="button" (click)="incrementar(l)" aria-label="Más">+</button>
+              </div>
+              <span class="precio">{{ cart.precioLinea(l) | money }}</span>
+            </div>
+            @if (l.medallonExtra || l.nota) {
+              <div class="meta">
+                @if (l.medallonExtra) { <span class="tag">＋ Medallón extra</span> }
+                @if (l.nota) { <span class="nota">“{{ l.nota }}”</span> }
+              </div>
+            }
+          </article>
+        }
+      </div>
+
+      <div class="subtotal">
+        <span>Subtotal</span>
+        <span class="monto font-anton">{{ cart.subtotal() | money }}</span>
+      </div>
+    }
+  </main>
+
+  @if (!cart.vacio()) {
+    <footer class="barra">
+      <button type="button" class="cta font-anton" (click)="continuar()">CONTINUAR →</button>
+    </footer>
+  }
+</div>

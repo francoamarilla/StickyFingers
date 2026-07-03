@@ -1,0 +1,49 @@
+@if (cargando()) {
+  <p class="info">Cargando pedidos…</p>
+} @else if (pedidos().length === 0) {
+  <p class="info">Todavía no hay pedidos.</p>
+} @else {
+  <div class="lista">
+    @for (p of pedidos(); track p.id) {
+      <article class="card">
+        <div class="head">
+          <span class="num font-anton">{{ p.numero }}</span>
+          <span class="hora">{{ p.fecha | date: 'dd/MM · HH:mm' }}</span>
+          <span class="spacer"></span>
+          <button
+            type="button"
+            class="chip"
+            [style.color]="estadoInfo(p.estado).color"
+            [style.borderColor]="estadoInfo(p.estado).color + '66'"
+            [style.background]="estadoInfo(p.estado).color + '26'"
+            (click)="avanzar(p)"
+          >
+            {{ estadoInfo(p.estado).label }}
+          </button>
+        </div>
+
+        <div class="cliente">
+          <b>{{ p.clienteNombre }}</b>
+          <span class="sep">·</span>
+          <span class="entrega">
+            {{ p.tipoEntrega === 'DELIVERY' ? 'Delivery · ' + p.direccion : 'Retiro en local' }}
+          </span>
+        </div>
+
+        <ul class="items">
+          @for (it of p.items; track it.id) {
+            <li>
+              <span class="q">{{ it.cantidad }}x</span> {{ it.nombre }}
+              @if (detalleItem(it)) { <span class="det">— {{ detalleItem(it) }}</span> }
+            </li>
+          }
+        </ul>
+
+        <div class="foot">
+          <span class="pago">{{ p.medioPago === 'EFECTIVO' ? 'Efectivo' : 'Transferencia' }}</span>
+          <span class="total font-anton">{{ p.total | money }}</span>
+        </div>
+      </article>
+    }
+  </div>
+}
