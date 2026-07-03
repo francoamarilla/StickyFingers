@@ -1,0 +1,34 @@
+<div class="seg">
+  @for (r of rangos; track r.valor) {
+    <button type="button" [class.on]="rango() === r.valor" (click)="seleccionar(r.valor)">{{ r.label }}</button>
+  }
+</div>
+
+@if (informe(); as inf) {
+  <div class="kpis">
+    <div class="kpi">
+      <span class="valor font-anton">{{ inf.cantidadPedidos }}</span>
+      <span class="etq">Pedidos</span>
+    </div>
+    <div class="kpi">
+      <span class="valor font-anton">{{ inf.totalVentas | money }}</span>
+      <span class="etq">Ventas</span>
+    </div>
+  </div>
+
+  <h2 class="titulo font-anton">MÁS VENDIDOS</h2>
+  @if (inf.ranking.length === 0) {
+    <p class="info">Sin ventas en este período.</p>
+  } @else {
+    <ol class="ranking">
+      @for (r of inf.ranking; track r.nombre) {
+        <li>
+          <span class="nombre">{{ r.nombre }}</span>
+          <span class="cant">{{ r.cantidad }}</span>
+        </li>
+      }
+    </ol>
+  }
+} @else {
+  <p class="info">Cargando informe…</p>
+}

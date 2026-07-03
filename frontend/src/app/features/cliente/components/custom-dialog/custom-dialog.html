@@ -1,0 +1,48 @@
+<div class="dlg">
+  <header>
+    <h2 class="font-anton">{{ data.producto.nombre }}</h2>
+    <button type="button" class="close" (click)="cancelar()" aria-label="Cerrar">✕</button>
+  </header>
+
+  @if (data.producto.descripcion) {
+    <p class="desc">{{ data.producto.descripcion }}</p>
+  }
+
+  <section>
+    <span class="label font-anton">CANTIDAD</span>
+    <div class="stepper">
+      <button type="button" (click)="decrementar()" aria-label="Menos">–</button>
+      <span class="qty">{{ cantidad() }}</span>
+      <button type="button" (click)="incrementar()" aria-label="Más">+</button>
+    </div>
+    @if (enMaximo()) {
+      <p class="hint">Llegaste al máximo de hamburguesas del pedido</p>
+    }
+  </section>
+
+  <section>
+    <span class="label font-anton">EXTRA</span>
+    <button type="button" class="medallon" [class.on]="medallonExtra()" (click)="toggleMedallon()">
+      <span class="check">{{ medallonExtra() ? '✓' : '' }}</span>
+      <span class="txt">
+        <strong>Medallón extra</strong>
+        <small>Doble carne en esta hamburguesa</small>
+      </span>
+      <span class="precio">+{{ medallonPrecio | money }}</span>
+    </button>
+  </section>
+
+  <section>
+    <span class="label font-anton">ACLARACIÓN</span>
+    <textarea
+      rows="2"
+      placeholder="Ej: sin tomate, cortada al medio, poca sal…"
+      [ngModel]="nota()"
+      (ngModelChange)="nota.set($event)"
+    ></textarea>
+  </section>
+
+  <button type="button" class="cta font-anton" (click)="agregar()">
+    AGREGAR AL PEDIDO <span class="sep"></span> {{ precioLinea() | money }}
+  </button>
+</div>

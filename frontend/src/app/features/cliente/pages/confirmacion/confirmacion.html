@@ -1,0 +1,35 @@
+@if (pedido(); as p) {
+  <div class="page">
+    <main>
+      <div class="check">✓</div>
+      <h1 class="font-anton">¡PEDIDO LISTO!</h1>
+      <p class="sub">
+        Tu pedido <b>{{ p.numero }}</b> quedó registrado. Enviálo por WhatsApp para confirmarlo con el local.
+      </p>
+
+      <div class="resumen">
+        @for (it of p.items; track it.id) {
+          <div class="fila">
+            <span>
+              {{ it.cantidad }}x {{ it.nombre }}
+              @if (it.medallonExtra) { <em>(medallón extra)</em> }
+            </span>
+            <span class="monto">{{ it.subtotalLinea | money }}</span>
+          </div>
+        }
+        @if (p.tipoEntrega === 'DELIVERY') {
+          <div class="fila"><span>Envío</span><span class="monto">{{ p.costoEnvio | money }}</span></div>
+        }
+        <div class="fila total">
+          <span class="font-anton">TOTAL</span>
+          <span class="font-anton tot">{{ p.total | money }}</span>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <a class="wa font-anton" [href]="waLink()" target="_blank" rel="noopener">ENVIAR POR WHATSAPP</a>
+      <button type="button" class="ghost font-anton" (click)="otroPedido()">HACER OTRO PEDIDO</button>
+    </footer>
+  </div>
+}

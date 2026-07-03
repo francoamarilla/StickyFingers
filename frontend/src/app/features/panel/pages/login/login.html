@@ -1,0 +1,20 @@
+<div class="login">
+  <form class="card" (ngSubmit)="ingresar()">
+    <img src="logo.png" alt="Sticky Burgers" class="logo" />
+    <h1 class="font-anton">PANEL DEL LOCAL</h1>
+    <p class="sub">Acceso exclusivo del administrador</p>
+
+    <input class="in" placeholder="Usuario" autocomplete="username"
+      [ngModel]="username()" (ngModelChange)="username.set($event)" name="username" />
+    <input class="in" type="password" placeholder="Contraseña" autocomplete="current-password"
+      [ngModel]="password()" (ngModelChange)="password.set($event)" name="password" />
+
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+
+    <button type="submit" class="cta font-anton" [disabled]="enviando()">
+      {{ enviando() ? 'INGRESANDO…' : 'INGRESAR' }}
+    </button>
+  </form>
+</div>

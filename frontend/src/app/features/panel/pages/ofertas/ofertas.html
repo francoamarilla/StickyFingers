@@ -1,0 +1,40 @@
+<form class="editor" (ngSubmit)="guardar()">
+  <h2 class="font-anton">{{ editandoId() ? 'EDITAR OFERTA' : 'NUEVA OFERTA' }}</h2>
+  <input class="in" placeholder="Título" name="titulo" [ngModel]="titulo()" (ngModelChange)="titulo.set($event)" />
+  <textarea class="in" rows="2" placeholder="Descripción" name="descripcion" [ngModel]="descripcion()" (ngModelChange)="descripcion.set($event)"></textarea>
+  <div class="fila">
+    <input class="in" type="number" placeholder="Precio" name="precio" [ngModel]="precio()" (ngModelChange)="precio.set($event)" />
+    <input class="in" placeholder="Vigencia (ej: Solo hoy)" name="vigencia" [ngModel]="vigencia()" (ngModelChange)="vigencia.set($event)" />
+  </div>
+  <label class="chk">
+    <input type="checkbox" name="activa" [ngModel]="activa()" (ngModelChange)="activa.set($event)" />
+    Activa (visible para clientes)
+  </label>
+  <div class="acciones">
+    @if (editandoId()) {
+      <button type="button" class="ghost" (click)="nueva()">Cancelar</button>
+    }
+    <button type="submit" class="cta font-anton">{{ editandoId() ? 'GUARDAR' : 'CREAR' }}</button>
+  </div>
+</form>
+
+<div class="lista">
+  @for (o of ofertas(); track o.id) {
+    <article class="card" [class.inactiva]="!o.activa">
+      <div class="row">
+        <h3 class="font-anton">{{ o.titulo }}</h3>
+        <span class="precio">{{ o.precio | money }}</span>
+      </div>
+      @if (o.descripcion) { <p class="desc">{{ o.descripcion }}</p> }
+      <div class="foot">
+        <span class="vig">{{ o.vigencia }} @if (!o.activa) { · inactiva }</span>
+        <span class="btns">
+          <button type="button" (click)="editar(o)">Editar</button>
+          <button type="button" class="del" (click)="eliminar(o)">Eliminar</button>
+        </span>
+      </div>
+    </article>
+  } @empty {
+    <p class="info">No hay ofertas cargadas.</p>
+  }
+</div>

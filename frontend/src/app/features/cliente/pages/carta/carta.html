@@ -1,0 +1,66 @@
+<div class="page">
+  <header class="topbar">
+    <img src="logo.png" alt="Sticky Burgers" class="logo" />
+    <div class="brand">
+      <span class="font-anton">STICKY <span class="red">BURGERS</span></span>
+      <small>Hamburguesas artesanales</small>
+    </div>
+    <button type="button" class="cart-btn" (click)="verPedido()" aria-label="Ver pedido">
+      🛒
+      @if (cart.cantidadItems() > 0) {
+        <span class="badge">{{ cart.cantidadItems() }}</span>
+      }
+    </button>
+  </header>
+
+  <main>
+    <div class="aviso">
+      🔥 Todo se cocina en el momento. Máximo
+      <b>{{ maxHamburguesas }} hamburguesas</b> por pedido.
+    </div>
+
+    <h2 class="seccion font-anton">HAMBURGUESAS</h2>
+    <div class="lista">
+      @for (b of hamburguesas(); track b.id) {
+        <article class="card">
+          <div class="row">
+            <h3 class="font-anton">{{ b.nombre }}</h3>
+            <span class="precio">{{ b.precio | money }}</span>
+          </div>
+          <p class="desc">{{ b.descripcion }}</p>
+          <div class="acciones">
+            @if (cantidadEnPedido(b) > 0) {
+              <span class="en-pedido">{{ cantidadEnPedido(b) }} en pedido</span>
+            }
+            <button type="button" class="add" (click)="abrirCustom(b)">AGREGAR +</button>
+          </div>
+        </article>
+      } @empty {
+        <p class="vacio">Cargando la carta…</p>
+      }
+    </div>
+
+    @if (extras().length > 0) {
+      <h2 class="seccion font-anton">EXTRAS</h2>
+      <div class="lista">
+        @for (e of extras(); track e.id) {
+          <article class="card extra">
+            <span class="nombre">{{ e.nombre }}</span>
+            <span class="precio">{{ e.precio | money }}</span>
+            <button type="button" class="add-mini" (click)="agregarExtra(e)" aria-label="Agregar">+</button>
+          </article>
+        }
+      </div>
+    }
+  </main>
+
+  @if (cart.cantidadItems() > 0) {
+    <footer class="barra">
+      <button type="button" class="ver font-anton" (click)="verPedido()">
+        VER PEDIDO · {{ cart.cantidadItems() }}
+        <span class="sep"></span>
+        {{ cart.subtotal() | money }} →
+      </button>
+    </footer>
+  }
+</div>
