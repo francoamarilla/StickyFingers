@@ -21,7 +21,7 @@
         @for (l of cart.lines(); track l.lineId) {
           <article class="card">
             <div class="row">
-              <h3 class="font-anton">{{ l.producto.nombre }}</h3>
+              <h3 class="font-anton">{{ l.nombre }}</h3>
               <button type="button" class="x" (click)="quitar(l)" aria-label="Quitar">✕</button>
             </div>
             <div class="row2">

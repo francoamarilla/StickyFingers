@@ -1,32 +1,59 @@
 import { RADIO_MAX_KM } from './constants';
 
-interface Zona {
-  claves: string[];
-  km: number;
+/** Ubicación del local (Buenos Aires 1058, Córdoba Capital). Coincide con sticky.delivery.origen-* del backend. */
+export const ORIGEN = { lat: -31.4265, lng: -64.1888 } as const;
+
+const RADIO_TIERRA_KM = 6371;
+
+export interface Coordenadas {
+  lat: number;
+  lng: number;
 }
 
-const ZONAS: Zona[] = [
-  { claves: ['nueva cordoba', 'nva cordoba', 'n cordoba'], km: 1.5 },
-  { claves: ['centro'], km: 2 },
-  { claves: ['guemes'], km: 2.5 },
-  { claves: ['observatorio'], km: 3 },
-  { claves: ['alberdi', 'general paz', 'gral paz', 'san vicente'], km: 3.5 },
-];
+/** Distancia en km entre el local y unas coordenadas (fórmula de Haversine). Preview: el backend es la fuente de verdad. */
+export function haversineKm(lat: number, lng: number): number {
+  const toRad = (g: number) => (g * Math.PI) / 180;
+  const dLat = toRad(lat - ORIGEN.lat);
+  const dLng = toRad(lng - ORIGEN.lng);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(ORIGEN.lat)) * Math.cos(toRad(lat)) * Math.sin(dLng / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(RADIO_TIERRA_KM * c * 100) / 100;
+}
 
-/** Estima los km a partir del texto de la dirección (igual que el prototipo). Preview: el backend es la fuente de verdad. */
-export function estimarKm(direccion: string): number {
-  const s = (direccion || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-  for (const zona of ZONAS) {
-    if (zona.claves.some((c) => s.includes(c))) {
-      return zona.km;
+/**
+ * Geocodifica una dirección de Córdoba a coordenadas usando Nominatim (OpenStreetMap).
+ * Usa fetch nativo (no HttpClient) para no adjuntar el JWT del interceptor a un host externo.
+ * Devuelve null si no encuentra la dirección.
+ */
+export async function geocodificar(direccion: string): Promise<Coordenadas | null> {
+  const q = direccion.trim();
+  if (!q) {
+    return null;
+  }
+  const params = new URLSearchParams({
+    format: 'json',
+    limit: '1',
+    countrycodes: 'ar',
+    city: 'Córdoba',
+    street: q,
+  });
+  try {
+    const resp = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
+      headers: { Accept: 'application/json' },
+    });
+    if (!resp.ok) {
+      return null;
     }
+    const data = (await resp.json()) as Array<{ lat: string; lon: string }>;
+    if (!data.length) {
+      return null;
+    }
+    return { lat: Number(data[0].lat), lng: Number(data[0].lon) };
+  } catch {
+    return null;
   }
-  let h = 0;
-  for (let i = 0; i < s.length; i++) {
-    h = (h * 31 + s.charCodeAt(i)) >>> 0;
-  }
-  const opciones = [1, 1.5, 2, 2.5, 3, 3.5];
-  return opciones[h % opciones.length];
 }
 
 /** Costo de envío estimado (preview). Devuelve null si está fuera de radio. */

@@ -16,7 +16,7 @@
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--sticky-border);
 
-  .logo { width: 38px; height: 38px; border-radius: 10px; border: 2px solid var(--sticky-red); object-fit: cover; }
+  .logo { width: 52px; height: 52px; object-fit: contain; }
   .title { flex: 1; font-size: 20px; }
   .salir {
     background: transparent;
@@ -31,7 +31,7 @@
 
 .tabs {
   position: sticky;
-  top: 63px;
+  top: 77px;
   z-index: 19;
   display: flex;
   gap: 4px;
@@ -47,6 +47,27 @@
     font-size: 14px;
     border-bottom: 2px solid transparent;
     &.on { color: var(--sticky-yellow); border-bottom-color: var(--sticky-yellow); }
+  }
+
+  .lluvia-btn {
+    margin-left: auto;
+    align-self: center;
+    background: transparent;
+    color: var(--sticky-dim);
+    border: 1px solid var(--sticky-border);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    &.on {
+      color: #bfe0ff;
+      border-color: #4a90d9;
+      background: rgba(74, 144, 217, 0.16);
+    }
+    &:disabled { opacity: 0.6; cursor: default; }
   }
 }
 

@@ -16,6 +16,8 @@ sticky:
   medallon-precio: 3500
   delivery:
     radio-max-km: 3
+    origen-lat: -31.4265
+    origen-lng: -64.1888
   jwt:
     secret: dGVzdC1zZWNyZXQtc3RpY2t5LWJ1cmdlcnMtMjU2LWJpdHMtbWluaW11bS1sZW5ndGgtb2s
     expiration-ms: 3600000

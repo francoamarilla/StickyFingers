@@ -9,6 +9,16 @@
     <a routerLink="pedidos" routerLinkActive="on">Pedidos</a>
     <a routerLink="ofertas" routerLinkActive="on">Ofertas</a>
     <a routerLink="informes" routerLinkActive="on">Informes</a>
+    <button
+      type="button"
+      class="lluvia-btn"
+      [class.on]="lluvia()"
+      [disabled]="guardandoLluvia()"
+      (click)="toggleLluvia()"
+      [attr.aria-pressed]="lluvia()"
+    >
+      ☔ {{ lluvia() ? 'Lloviendo' : 'Sin lluvia' }}
+    </button>
   </nav>
 
   <main>

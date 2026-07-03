@@ -25,20 +25,23 @@ class PedidoServiceTest {
 
     @Mock PedidoRepository pedidoRepository;
     @Mock ProductoService productoService;
+    @Mock OfertaService ofertaService;
     @Mock CostoEnvioService costoEnvioService;
+    @Mock ConfiguracionService configuracionService;
     @Mock PedidoEventPublisher eventos;
     @Mock PedidoMapper mapper;
 
     PedidoService service;
 
     private final StickyProperties props = new StickyProperties(3500,
-            new StickyProperties.Delivery(3),
+            new StickyProperties.Delivery(3, -31.4265, -64.1888),
             new StickyProperties.Jwt("x".repeat(40), 3600000),
             new StickyProperties.Admin("admin", "admin123"));
 
     @BeforeEach
     void setUp() {
-        service = new PedidoService(pedidoRepository, productoService, costoEnvioService, eventos, mapper, props);
+        service = new PedidoService(pedidoRepository, productoService, ofertaService, costoEnvioService,
+                configuracionService, eventos, mapper, props);
         lenient().when(pedidoRepository.save(any(Pedido.class))).thenAnswer(inv -> inv.getArgument(0));
         lenient().when(mapper.toDto(any(Pedido.class))).thenReturn(mock(PedidoDto.class));
     }
@@ -53,9 +56,9 @@ class PedidoServiceTest {
         when(costoEnvioService.calcular(TipoEntrega.RETIRO, null, false)).thenReturn(0);
         when(pedidoRepository.count()).thenReturn(0L);
 
-        var req = new CrearPedidoRequest("Ana", "3548", TipoEntrega.RETIRO, null, null, false,
+        var req = new CrearPedidoRequest("Ana", "3548", TipoEntrega.RETIRO, null, null, null,
                 MedioPago.EFECTIVO, null,
-                List.of(new ItemPedidoRequest(1L, 2, true, "sin sal")));
+                List.of(new ItemPedidoRequest(1L, null, 2, true, "sin sal")));
 
         service.crear(req);
 
@@ -75,12 +78,14 @@ class PedidoServiceTest {
     @Test
     void totalIncluyeEnvioSinRecargoPorPago() {
         when(productoService.buscar(1L)).thenReturn(burger(1L, 10000));
+        when(costoEnvioService.haversineKm(any(), any())).thenReturn(new java.math.BigDecimal("2.0"));
         when(costoEnvioService.calcular(any(), any(), anyBoolean())).thenReturn(2500);
         when(pedidoRepository.count()).thenReturn(5L);
 
         var req = new CrearPedidoRequest("Ana", "3548", TipoEntrega.DELIVERY, "Centro",
-                new java.math.BigDecimal("2.0"), false, MedioPago.TRANSFERENCIA, null,
-                List.of(new ItemPedidoRequest(1L, 1, false, null)));
+                new java.math.BigDecimal("-31.42"), new java.math.BigDecimal("-64.18"),
+                MedioPago.TRANSFERENCIA, null,
+                List.of(new ItemPedidoRequest(1L, null, 1, false, null)));
 
         service.crear(req);
 
@@ -97,9 +102,9 @@ class PedidoServiceTest {
     void masDeSeisHamburguesasFalla() {
         when(productoService.buscar(1L)).thenReturn(burger(1L, 8000));
 
-        var req = new CrearPedidoRequest("Ana", "3548", TipoEntrega.RETIRO, null, null, false,
+        var req = new CrearPedidoRequest("Ana", "3548", TipoEntrega.RETIRO, null, null, null,
                 MedioPago.EFECTIVO, null,
-                List.of(new ItemPedidoRequest(1L, 7, false, null)));
+                List.of(new ItemPedidoRequest(1L, null, 7, false, null)));
 
         assertThatThrownBy(() -> service.crear(req))
                 .isInstanceOf(ReglaNegocioException.class)

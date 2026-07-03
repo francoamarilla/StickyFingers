@@ -35,7 +35,10 @@ export interface Pedido {
 }
 
 export interface ItemPedidoRequest {
-  productoId: number;
+  /** Producto del menú (excluyente con ofertaId). */
+  productoId?: number | null;
+  /** Oferta activa (excluyente con productoId). */
+  ofertaId?: number | null;
   cantidad: number;
   medallonExtra: boolean;
   nota?: string | null;
@@ -46,8 +49,9 @@ export interface CrearPedidoRequest {
   clienteTelefono: string;
   tipoEntrega: TipoEntrega;
   direccion?: string | null;
-  km?: number | null;
-  lluvia: boolean;
+  /** Coordenadas de la dirección (delivery); el backend calcula la distancia con Haversine. */
+  lat?: number | null;
+  lng?: number | null;
   medioPago: MedioPago;
   notaGeneral?: string | null;
   items: ItemPedidoRequest[];

@@ -3,7 +3,7 @@
   <input class="in" placeholder="Título" name="titulo" [ngModel]="titulo()" (ngModelChange)="titulo.set($event)" />
   <textarea class="in" rows="2" placeholder="Descripción" name="descripcion" [ngModel]="descripcion()" (ngModelChange)="descripcion.set($event)"></textarea>
   <div class="fila">
-    <input class="in" type="number" placeholder="Precio" name="precio" [ngModel]="precio()" (ngModelChange)="precio.set($event)" />
+    <input class="in" type="text" inputmode="numeric" placeholder="Precio (ej. $18.000)" name="precio" [ngModel]="precioTexto()" (ngModelChange)="onPrecio($event)" />
     <input class="in" placeholder="Vigencia (ej: Solo hoy)" name="vigencia" [ngModel]="vigencia()" (ngModelChange)="vigencia.set($event)" />
   </div>
   <label class="chk">
@@ -29,6 +29,7 @@
       <div class="foot">
         <span class="vig">{{ o.vigencia }} @if (!o.activa) { · inactiva }</span>
         <span class="btns">
+          <button type="button" (click)="descargarImagen(o)">Imagen 9:16</button>
           <button type="button" (click)="editar(o)">Editar</button>
           <button type="button" class="del" (click)="eliminar(o)">Eliminar</button>
         </span>

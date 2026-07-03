@@ -1,11 +1,20 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { Producto } from '../../core/models/menu.model';
+import { Oferta } from '../../core/models/oferta.model';
 import { ItemPedidoRequest, MedioPago, TipoEntrega } from '../../core/models/pedido.model';
 import { MAX_HAMBURGUESAS, MEDALLON_PRECIO } from '../../core/constants';
 
+export type CartItemTipo = 'HAMBURGUESA' | 'EXTRA' | 'OFERTA';
+
+/** Línea del carrito. Referencia un producto del menú o una oferta (precio fijo). */
 export interface CartLine {
   lineId: string;
-  producto: Producto;
+  tipo: CartItemTipo;
+  /** id del producto o de la oferta según `esOferta`. */
+  refId: number;
+  esOferta: boolean;
+  nombre: string;
+  precioBase: number;
   cantidad: number;
   medallonExtra: boolean;
   nota: string;
@@ -16,8 +25,8 @@ export interface DatosEntrega {
   clienteTelefono: string;
   tipoEntrega: TipoEntrega;
   direccion: string;
-  km: number | null;
-  lluvia: boolean;
+  lat: number | null;
+  lng: number | null;
   medioPago: MedioPago;
   notaGeneral: string;
 }
@@ -27,8 +36,8 @@ const ENTREGA_INICIAL: DatosEntrega = {
   clienteTelefono: '',
   tipoEntrega: 'RETIRO',
   direccion: '',
-  km: null,
-  lluvia: false,
+  lat: null,
+  lng: null,
   medioPago: 'EFECTIVO',
   notaGeneral: '',
 };
@@ -45,7 +54,7 @@ export class CartStore {
 
   readonly cantidadHamburguesas = computed(() =>
     this._lines()
-      .filter((l) => l.producto.tipo === 'HAMBURGUESA')
+      .filter((l) => l.tipo === 'HAMBURGUESA')
       .reduce((a, l) => a + l.cantidad, 0),
   );
 
@@ -56,8 +65,8 @@ export class CartStore {
   readonly vacio = computed(() => this._lines().length === 0);
 
   precioUnitario(line: CartLine): number {
-    const medallon = line.producto.tipo === 'HAMBURGUESA' && line.medallonExtra ? MEDALLON_PRECIO : 0;
-    return line.producto.precio + medallon;
+    const medallon = line.tipo === 'HAMBURGUESA' && line.medallonExtra ? MEDALLON_PRECIO : 0;
+    return line.precioBase + medallon;
   }
 
   precioLinea(line: CartLine): number {
@@ -70,18 +79,36 @@ export class CartStore {
   }
 
   agregarHamburguesa(producto: Producto, cantidad: number, medallonExtra: boolean, nota: string): void {
-    const line: CartLine = { lineId: this.nuevoId(), producto, cantidad, medallonExtra, nota: nota.trim() };
+    const line: CartLine = {
+      lineId: this.nuevoId(),
+      tipo: 'HAMBURGUESA',
+      refId: producto.id,
+      esOferta: false,
+      nombre: producto.nombre,
+      precioBase: producto.precio,
+      cantidad,
+      medallonExtra,
+      nota: nota.trim(),
+    };
     this._lines.update((ls) => [...ls, line]);
   }
 
   agregarExtra(producto: Producto): void {
-    const existente = this._lines().find((l) => l.producto.tipo === 'EXTRA' && l.producto.id === producto.id);
+    const existente = this._lines().find((l) => l.tipo === 'EXTRA' && l.refId === producto.id);
     if (existente) {
       this.incrementar(existente.lineId);
       return;
     }
-    const line: CartLine = { lineId: this.nuevoId(), producto, cantidad: 1, medallonExtra: false, nota: '' };
-    this._lines.update((ls) => [...ls, line]);
+    this._lines.update((ls) => [...ls, this.lineaSimple('EXTRA', producto.id, producto.nombre, producto.precio)]);
+  }
+
+  agregarOferta(oferta: Oferta): void {
+    const existente = this._lines().find((l) => l.tipo === 'OFERTA' && l.refId === oferta.id);
+    if (existente) {
+      this.incrementar(existente.lineId);
+      return;
+    }
+    this._lines.update((ls) => [...ls, this.lineaSimple('OFERTA', oferta.id, oferta.titulo, oferta.precio)]);
   }
 
   incrementar(lineId: string): void {
@@ -109,12 +136,25 @@ export class CartStore {
 
   /** Convierte las líneas al formato que espera el backend. */
   toItemsRequest(): ItemPedidoRequest[] {
-    return this._lines().map((l) => ({
-      productoId: l.producto.id,
-      cantidad: l.cantidad,
-      medallonExtra: l.medallonExtra,
-      nota: l.nota || null,
-    }));
+    return this._lines().map((l) =>
+      l.esOferta
+        ? { ofertaId: l.refId, cantidad: l.cantidad, medallonExtra: false, nota: l.nota || null }
+        : { productoId: l.refId, cantidad: l.cantidad, medallonExtra: l.medallonExtra, nota: l.nota || null },
+    );
+  }
+
+  private lineaSimple(tipo: CartItemTipo, refId: number, nombre: string, precioBase: number): CartLine {
+    return {
+      lineId: this.nuevoId(),
+      tipo,
+      refId,
+      esOferta: tipo === 'OFERTA',
+      nombre,
+      precioBase,
+      cantidad: 1,
+      medallonExtra: false,
+      nota: '',
+    };
   }
 
   private nuevoId(): string {

@@ -18,11 +18,9 @@
   gap: 12px;
 
   .logo {
-    width: 84px;
-    height: 84px;
-    border-radius: 20px;
-    border: 2px solid var(--sticky-red);
-    object-fit: cover;
+    width: 124px;
+    height: 124px;
+    object-fit: contain;
     margin-bottom: 4px;
   }
 

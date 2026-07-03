@@ -5,6 +5,7 @@ import com.stickyburgers.repository.OfertaRepository;
 import com.stickyburgers.web.dto.OfertaDto;
 import com.stickyburgers.web.dto.OfertaRequest;
 import com.stickyburgers.web.error.RecursoNoEncontradoException;
+import com.stickyburgers.web.error.ReglaNegocioException;
 import com.stickyburgers.web.mapper.OfertaMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +53,15 @@ public class OfertaService {
             throw new RecursoNoEncontradoException("Oferta " + id + " no encontrada");
         }
         repository.deleteById(id);
+    }
+
+    /** Oferta que además debe estar activa (para poder comprarla en un pedido). */
+    public Oferta buscarActiva(Long id) {
+        Oferta oferta = buscar(id);
+        if (!oferta.isActiva()) {
+            throw new ReglaNegocioException("La oferta '" + oferta.getTitulo() + "' ya no está disponible");
+        }
+        return oferta;
     }
 
     private Oferta buscar(Long id) {

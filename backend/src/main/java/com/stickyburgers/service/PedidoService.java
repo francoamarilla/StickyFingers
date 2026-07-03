@@ -24,17 +24,22 @@ public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
     private final ProductoService productoService;
+    private final OfertaService ofertaService;
     private final CostoEnvioService costoEnvioService;
+    private final ConfiguracionService configuracionService;
     private final PedidoEventPublisher eventos;
     private final PedidoMapper mapper;
     private final int medallonPrecio;
 
     public PedidoService(PedidoRepository pedidoRepository, ProductoService productoService,
-                         CostoEnvioService costoEnvioService, PedidoEventPublisher eventos,
+                         OfertaService ofertaService, CostoEnvioService costoEnvioService,
+                         ConfiguracionService configuracionService, PedidoEventPublisher eventos,
                          PedidoMapper mapper, StickyProperties props) {
         this.pedidoRepository = pedidoRepository;
         this.productoService = productoService;
+        this.ofertaService = ofertaService;
         this.costoEnvioService = costoEnvioService;
+        this.configuracionService = configuracionService;
         this.eventos = eventos;
         this.mapper = mapper;
         this.medallonPrecio = props.medallonPrecio();
@@ -42,14 +47,18 @@ public class PedidoService {
 
     @Transactional
     public PedidoDto crear(CrearPedidoRequest req) {
+        boolean esDelivery = req.tipoEntrega() == TipoEntrega.DELIVERY;
+        boolean lluvia = configuracionService.isLluvia();
+        java.math.BigDecimal km = esDelivery ? costoEnvioService.haversineKm(req.lat(), req.lng()) : null;
+
         Pedido pedido = new Pedido();
         pedido.setFecha(Instant.now());
         pedido.setClienteNombre(req.clienteNombre().trim());
         pedido.setClienteTelefono(req.clienteTelefono().trim());
         pedido.setTipoEntrega(req.tipoEntrega());
-        pedido.setDireccion(req.tipoEntrega() == TipoEntrega.DELIVERY ? textoOrNull(req.direccion()) : null);
-        pedido.setKm(req.tipoEntrega() == TipoEntrega.DELIVERY ? req.km() : null);
-        pedido.setLluvia(req.lluvia());
+        pedido.setDireccion(esDelivery ? textoOrNull(req.direccion()) : null);
+        pedido.setKm(km);
+        pedido.setLluvia(lluvia);
         pedido.setMedioPago(req.medioPago());
         pedido.setNotaGeneral(textoOrNull(req.notaGeneral()));
         pedido.setEstado(EstadoPedido.NUEVO);
@@ -57,22 +66,41 @@ public class PedidoService {
         int subtotal = 0;
         int hamburguesas = 0;
         for (ItemPedidoRequest linea : req.items()) {
-            Producto producto = productoService.buscar(linea.productoId());
-            boolean esBurger = producto.getTipo() == TipoProducto.HAMBURGUESA;
-            boolean medallon = esBurger && linea.medallonExtra();
+            ItemPedido item;
+            int unitario;
+            boolean esBurger = false;
 
-            ItemPedido item = ItemPedido.builder()
-                    .producto(producto)
-                    .nombre(producto.getNombre())
-                    .precioUnitario(producto.getPrecio())
-                    .cantidad(linea.cantidad())
-                    .medallonExtra(medallon)
-                    .nota(textoOrNull(linea.nota()))
-                    .tipoLinea(esBurger ? TipoLinea.BURGER : TipoLinea.EXTRA)
-                    .build();
+            if (linea.esOferta()) {
+                Oferta oferta = ofertaService.buscarActiva(linea.ofertaId());
+                item = ItemPedido.builder()
+                        .nombre(oferta.getTitulo())
+                        .precioUnitario(oferta.getPrecio())
+                        .cantidad(linea.cantidad())
+                        .medallonExtra(false)
+                        .nota(textoOrNull(linea.nota()))
+                        .tipoLinea(TipoLinea.OFERTA)
+                        .build();
+                unitario = oferta.getPrecio();
+            } else {
+                if (linea.productoId() == null) {
+                    throw new ReglaNegocioException("Cada línea debe referenciar un producto o una oferta");
+                }
+                Producto producto = productoService.buscar(linea.productoId());
+                esBurger = producto.getTipo() == TipoProducto.HAMBURGUESA;
+                boolean medallon = esBurger && linea.medallonExtra();
+                item = ItemPedido.builder()
+                        .producto(producto)
+                        .nombre(producto.getNombre())
+                        .precioUnitario(producto.getPrecio())
+                        .cantidad(linea.cantidad())
+                        .medallonExtra(medallon)
+                        .nota(textoOrNull(linea.nota()))
+                        .tipoLinea(esBurger ? TipoLinea.BURGER : TipoLinea.EXTRA)
+                        .build();
+                unitario = producto.getPrecio() + (medallon ? medallonPrecio : 0);
+            }
+
             pedido.addItem(item);
-
-            int unitario = producto.getPrecio() + (medallon ? medallonPrecio : 0);
             subtotal += unitario * linea.cantidad();
             if (esBurger) {
                 hamburguesas += linea.cantidad();
@@ -83,7 +111,7 @@ public class PedidoService {
             throw new ReglaNegocioException("Máximo " + MAX_HAMBURGUESAS + " hamburguesas por pedido");
         }
 
-        int costoEnvio = costoEnvioService.calcular(req.tipoEntrega(), req.km(), req.lluvia());
+        int costoEnvio = costoEnvioService.calcular(req.tipoEntrega(), km, lluvia);
         pedido.setSubtotal(subtotal);
         pedido.setCostoEnvio(costoEnvio);
         pedido.setTotal(subtotal + costoEnvio);
