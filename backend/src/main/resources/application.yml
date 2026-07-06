@@ -19,10 +19,12 @@ sticky:
     secret: ${JWT_SECRET:ZmFsbGJhY2stZGV2LXNlY3JldC1jaGFuZ2UtbWUtc3RpY2t5LWJ1cmdlcnMtMjU2Yml0c30}
     # Expiración del token en milisegundos (8 horas)
     expiration-ms: ${JWT_EXPIRATION_MS:28800000}
-  # Credenciales del admin sembrado al iniciar (si no existe)
+  # Credenciales del admin sembrado al iniciar (si no existe).
+  # Sin default a propósito: definí ADMIN_USERNAME / ADMIN_PASSWORD en el entorno
+  # antes de arrancar. Si faltan, la app no levanta (fail-fast, no se commitean secretos).
   admin:
-    username: ${ADMIN_USERNAME:StickyFingers}
-    password: ${ADMIN_PASSWORD:Sticky123}
+    username: ${ADMIN_USERNAME}
+    password: ${ADMIN_PASSWORD}
 
 springdoc:
   swagger-ui:

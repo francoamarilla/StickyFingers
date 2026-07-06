@@ -38,17 +38,20 @@ docker compose up -d postgres
 
 ### 2. Backend (API en `http://localhost:8080`)
 
+Las credenciales del admin son **obligatorias** por entorno (sin default en el repo).
+Si `ADMIN_USERNAME` / `ADMIN_PASSWORD` faltan, el backend no arranca.
+
 ```bash
 cd backend
-./mvnw spring-boot:run
+ADMIN_USERNAME=tu_usuario ADMIN_PASSWORD=tu_password ./mvnw spring-boot:run
 # si usaste 5433 para la DB:
-DB_PORT=5433 ./mvnw spring-boot:run
+DB_PORT=5433 ADMIN_USERNAME=tu_usuario ADMIN_PASSWORD=tu_password ./mvnw spring-boot:run
 ```
 
-Flyway crea el esquema y siembra el menú. Al iniciar se crea el usuario admin si no existe,
-tomando las credenciales de las variables de entorno `ADMIN_USERNAME` / `ADMIN_PASSWORD`
-(definí las tuyas antes del primer arranque; no se documentan acá por seguridad). Swagger UI
-en `http://localhost:8080/swagger-ui.html`.
+> En PowerShell (Windows): `$env:ADMIN_USERNAME="tu_usuario"; $env:ADMIN_PASSWORD="tu_password"; .\mvnw.cmd spring-boot:run`
+
+Flyway crea el esquema y siembra el menú. Al iniciar se crea el usuario admin (si no existe)
+con esas credenciales. Swagger UI en `http://localhost:8080/swagger-ui.html`.
 
 ### 3. Frontend (SPA en `http://localhost:4200`)
 
