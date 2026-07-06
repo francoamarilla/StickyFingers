@@ -4,8 +4,5 @@ export const MEDALLON_PRECIO = 3500;
 /** Máximo de hamburguesas por pedido (regla de negocio del backend). */
 export const MAX_HAMBURGUESAS = 6;
 
-/** Radio máximo de reparto en km. */
-export const RADIO_MAX_KM = 3;
-
 /** WhatsApp del local (para confirmar el pedido). */
 export const WA_NUMERO = '5493548574081';

@@ -48,27 +48,6 @@
     border-bottom: 2px solid transparent;
     &.on { color: var(--sticky-yellow); border-bottom-color: var(--sticky-yellow); }
   }
-
-  .lluvia-btn {
-    margin-left: auto;
-    align-self: center;
-    background: transparent;
-    color: var(--sticky-dim);
-    border: 1px solid var(--sticky-border);
-    border-radius: 999px;
-    padding: 7px 14px;
-    font-family: inherit;
-    font-weight: 600;
-    font-size: 13px;
-    cursor: pointer;
-    white-space: nowrap;
-    &.on {
-      color: #bfe0ff;
-      border-color: #4a90d9;
-      background: rgba(74, 144, 217, 0.16);
-    }
-    &:disabled { opacity: 0.6; cursor: default; }
-  }
 }
 
 main { padding: 16px; }

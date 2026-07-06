@@ -18,7 +18,12 @@
           </div>
         }
         @if (p.tipoEntrega === 'DELIVERY') {
-          <div class="fila"><span>Envío</span><span class="monto">{{ p.costoEnvio | money }}</span></div>
+          <div class="fila">
+            <span>Envío</span>
+            <span class="monto">
+              @if (p.costoEnvio > 0) { {{ p.costoEnvio | money }} } @else { a coordinar }
+            </span>
+          </div>
         }
         <div class="fila total">
           <span class="font-anton">TOTAL</span>

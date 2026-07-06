@@ -39,7 +39,7 @@ export class Confirmacion {
       '',
       `Cliente: ${p.clienteNombre}`,
       `Tel: ${p.clienteTelefono}`,
-      `Entrega: ${p.tipoEntrega === 'DELIVERY' ? `Delivery — ${p.direccion} (${p.km} km)` : 'Retiro en local'}`,
+      `Entrega: ${p.tipoEntrega === 'DELIVERY' ? `Delivery — ${p.direccion}` : 'Retiro en local'}`,
       '',
     ];
     for (const it of p.items) {
@@ -49,7 +49,7 @@ export class Confirmacion {
     L.push('');
     L.push(`Subtotal: $${p.subtotal.toLocaleString('es-AR')}`);
     if (p.tipoEntrega === 'DELIVERY') {
-      L.push(`Envío: $${p.costoEnvio.toLocaleString('es-AR')}`);
+      L.push('Envío: a coordinar');
     }
     L.push(`TOTAL: $${p.total.toLocaleString('es-AR')}`);
     L.push(`Pago: ${p.medioPago === 'EFECTIVO' ? 'Efectivo' : 'Transferencia'}`);

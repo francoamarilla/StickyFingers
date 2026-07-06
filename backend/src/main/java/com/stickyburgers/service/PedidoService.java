@@ -49,7 +49,13 @@ public class PedidoService {
     public PedidoDto crear(CrearPedidoRequest req) {
         boolean esDelivery = req.tipoEntrega() == TipoEntrega.DELIVERY;
         boolean lluvia = configuracionService.isLluvia();
-        java.math.BigDecimal km = esDelivery ? costoEnvioService.haversineKm(req.lat(), req.lng()) : null;
+        // Delivery sin coordenadas: el cliente no eligió una dirección sugerida y escribió la
+        // suya a mano. No se puede calcular la distancia, así que el envío se coordina luego
+        // por WhatsApp (no se cobra automáticamente).
+        boolean tieneCoordenadas = req.lat() != null && req.lng() != null;
+        java.math.BigDecimal km = (esDelivery && tieneCoordenadas)
+                ? costoEnvioService.haversineKm(req.lat(), req.lng())
+                : null;
 
         Pedido pedido = new Pedido();
         pedido.setFecha(Instant.now());
@@ -111,7 +117,12 @@ public class PedidoService {
             throw new ReglaNegocioException("Máximo " + MAX_HAMBURGUESAS + " hamburguesas por pedido");
         }
 
-        int costoEnvio = costoEnvioService.calcular(req.tipoEntrega(), km, lluvia);
+        // El envío solo se cobra automáticamente en delivery con dirección geolocalizada dentro del
+        // radio. Sin coordenadas o fuera de radio NO se cancela el pedido: se registra igual (envío 0)
+        // y el local coordina el costo con el cliente; la distancia queda guardada para que lo decida.
+        int costoEnvio = (esDelivery && costoEnvioService.dentroDelRadio(km))
+                ? costoEnvioService.calcular(TipoEntrega.DELIVERY, km, lluvia)
+                : 0;
         pedido.setSubtotal(subtotal);
         pedido.setCostoEnvio(costoEnvio);
         pedido.setTotal(subtotal + costoEnvio);

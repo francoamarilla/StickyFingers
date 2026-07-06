@@ -19,33 +19,8 @@
       </div>
 
       @if (esDelivery()) {
-        <input class="in" placeholder="Dirección (calle y número)" [ngModel]="direccion()" (ngModelChange)="onDireccion($event)" />
-        @if (lluvia()) {
-          <p class="lluvia-aviso">☔ Está lloviendo: el envío tiene un recargo.</p>
-        }
-        @if (geoEstado() === 'buscando') {
-          <p class="warn">Buscando la dirección…</p>
-        } @else if (geoEstado() === 'no-encontrada') {
-          <p class="warn">No pudimos ubicar esa dirección. Revisá calle y número (Córdoba Capital).</p>
-        } @else if (geoEstado() === 'ok') {
-          <div class="envio-box">
-            <div class="fila">
-              <span>Distancia</span>
-              <span class="val">{{ km() }} km</span>
-            </div>
-            <div class="fila total-fila">
-              <span>Costo de envío</span>
-              @if (fueraRadio()) {
-                <span class="fuera">Fuera de radio</span>
-              } @else {
-                <span class="val">{{ costoEnvio() | money }}</span>
-              }
-            </div>
-          </div>
-          @if (fueraRadio()) {
-            <p class="warn">Esa dirección queda fuera del radio de reparto (máx. 3 km). Probá otra o elegí retiro.</p>
-          }
-        }
+        <input class="in" placeholder="Calle y numeración, piso y depto (ej.: Av. Colón 1234, piso 3, depto B)" autocomplete="off" [ngModel]="direccion()" (ngModelChange)="direccion.set($event)" />
+        <p class="hint">El costo de envío lo coordina el local con vos.</p>
       }
     </section>
 
@@ -65,8 +40,8 @@
 
     <div class="resumen">
       <div class="fila"><span>Subtotal</span><span>{{ cart.subtotal() | money }}</span></div>
-      @if (esDelivery() && !fueraRadio()) {
-        <div class="fila"><span>Envío</span><span>{{ costoEnvio() | money }}</span></div>
+      @if (esDelivery()) {
+        <div class="fila"><span>Envío</span><span>a coordinar</span></div>
       }
       <div class="fila total">
         <span class="font-anton">TOTAL</span>

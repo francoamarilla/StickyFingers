@@ -53,7 +53,6 @@ class PedidoServiceTest {
     @Test
     void crearCalculaSubtotalTotalYNumero() {
         when(productoService.buscar(1L)).thenReturn(burger(1L, 8000));
-        when(costoEnvioService.calcular(TipoEntrega.RETIRO, null, false)).thenReturn(0);
         when(pedidoRepository.count()).thenReturn(0L);
 
         var req = new CrearPedidoRequest("Ana", "3548", TipoEntrega.RETIRO, null, null, null,
@@ -79,6 +78,7 @@ class PedidoServiceTest {
     void totalIncluyeEnvioSinRecargoPorPago() {
         when(productoService.buscar(1L)).thenReturn(burger(1L, 10000));
         when(costoEnvioService.haversineKm(any(), any())).thenReturn(new java.math.BigDecimal("2.0"));
+        when(costoEnvioService.dentroDelRadio(any())).thenReturn(true);
         when(costoEnvioService.calcular(any(), any(), anyBoolean())).thenReturn(2500);
         when(pedidoRepository.count()).thenReturn(5L);
 
@@ -96,6 +96,31 @@ class PedidoServiceTest {
         assertThat(p.getCostoEnvio()).isEqualTo(2500);
         assertThat(p.getTotal()).isEqualTo(12500);
         assertThat(p.getNumero()).isEqualTo("#006");
+    }
+
+    @Test
+    void deliverySinCoordenadasSeRegistraConEnvioACoordinar() {
+        // El cliente escribió la dirección a mano (sin elegir sugerencia): no se cancela el pedido,
+        // se registra con envío 0 y sin distancia para que el local coordine el envío.
+        when(productoService.buscar(1L)).thenReturn(burger(1L, 10000));
+        when(costoEnvioService.dentroDelRadio(any())).thenReturn(false);
+        when(pedidoRepository.count()).thenReturn(0L);
+
+        var req = new CrearPedidoRequest("Ana", "3548", TipoEntrega.DELIVERY, "Calle a mano 123",
+                null, null, MedioPago.EFECTIVO, null,
+                List.of(new ItemPedidoRequest(1L, null, 1, false, null)));
+
+        service.crear(req);
+
+        ArgumentCaptor<Pedido> captor = ArgumentCaptor.forClass(Pedido.class);
+        verify(pedidoRepository).save(captor.capture());
+        Pedido p = captor.getValue();
+        assertThat(p.getKm()).isNull();
+        assertThat(p.getCostoEnvio()).isZero();
+        assertThat(p.getTotal()).isEqualTo(10000);
+        assertThat(p.getDireccion()).isEqualTo("Calle a mano 123");
+        verify(costoEnvioService, never()).haversineKm(any(), any());
+        verify(eventos).pedidoNuevo(any());
     }
 
     @Test

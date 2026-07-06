@@ -46,6 +46,11 @@ public class CostoEnvioService {
         return BigDecimal.valueOf(RADIO_TIERRA_KM * c).setScale(2, java.math.RoundingMode.HALF_UP);
     }
 
+    /** true si hay distancia y está dentro del radio de reparto (delivery con envío calculable). */
+    public boolean dentroDelRadio(BigDecimal km) {
+        return km != null && km.compareTo(radioMaxKm) <= 0;
+    }
+
     /**
      * @return costo de envío en pesos; 0 si es retiro en el local.
      * @throws ReglaNegocioException si es delivery sin km válido o fuera del radio.
