@@ -1,0 +1,44 @@
+# Verificación LOCAL del stack productivo (Fase 0.6 del DEPLOY.md).
+# Levanta db + backend (perfil prod) + frontend construidos desde los Dockerfiles.
+#
+#   docker compose -f docker-compose.prod.yml up --build
+#
+# OJO (arquitectura de dos dominios): el frontend se compila con
+# apiBaseUrl=https://api.tudominio.com, así que sirviéndolo en localhost:8081 sus
+# llamadas NO llegan al backend local. Este compose sirve para verificar que las
+# imágenes buildean y que backend+Flyway+Swagger arrancan; la prueba front↔back
+# end-to-end se hace ya con el dominio real (o con el modo un-dominio + proxy).
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: sticky
+      POSTGRES_USER: sticky
+      POSTGRES_PASSWORD: devpassword
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: db
+      DB_NAME: sticky
+      DB_USER: sticky
+      DB_PASSWORD: devpassword
+      JWT_SECRET: un-secreto-de-prueba-largo-de-al-menos-256-bits-para-hmac-sha256
+      CORS_ORIGINS: http://localhost:8081
+      ADMIN_USERNAME: StickyFingers
+      ADMIN_PASSWORD: Sticky123
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8081:80"
+
+volumes:
+  pgdata:

@@ -25,6 +25,9 @@ sticky:
   admin:
     username: ${ADMIN_USERNAME}
     password: ${ADMIN_PASSWORD}
+  # Orígenes permitidos para CORS y WebSocket (front Angular). En prod: CORS_ORIGINS.
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:4200}
 
 springdoc:
   swagger-ui:
@@ -69,3 +72,7 @@ spring:
     show-sql: false
   flyway:
     enabled: true
+
+server:
+  # Respeta X-Forwarded-* del proxy de Coolify/Traefik (https y host correctos).
+  forward-headers-strategy: framework
