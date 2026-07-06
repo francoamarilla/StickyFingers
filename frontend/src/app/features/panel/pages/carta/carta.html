@@ -1,0 +1,43 @@
+<form class="editor" (ngSubmit)="guardar()">
+  <h2 class="font-anton">{{ editandoId() ? 'EDITAR PRODUCTO' : 'NUEVO PRODUCTO' }}</h2>
+  <div class="fila">
+    <select class="in" name="tipo" [ngModel]="tipo()" (ngModelChange)="tipo.set($event)">
+      <option value="HAMBURGUESA">Hamburguesa</option>
+      <option value="EXTRA">Extra</option>
+    </select>
+    <input class="in" placeholder="Nombre" name="nombre" [ngModel]="nombre()" (ngModelChange)="nombre.set($event)" />
+  </div>
+  <textarea class="in" rows="2" placeholder="Descripción" name="descripcion" [ngModel]="descripcion()" (ngModelChange)="descripcion.set($event)"></textarea>
+  <input class="in" type="text" inputmode="numeric" placeholder="Precio (ej. $8.000)" name="precio" [ngModel]="precioTexto()" (ngModelChange)="onPrecio($event)" />
+  <label class="chk">
+    <input type="checkbox" name="disponible" [ngModel]="disponible()" (ngModelChange)="disponible.set($event)" />
+    Visible en el menú
+  </label>
+  <div class="acciones">
+    @if (editandoId()) {
+      <button type="button" class="ghost" (click)="nuevo()">Cancelar</button>
+    }
+    <button type="submit" class="cta font-anton">{{ editandoId() ? 'GUARDAR' : 'CREAR' }}</button>
+  </div>
+</form>
+
+<div class="lista">
+  @for (p of productos(); track p.id) {
+    <article class="card" [class.inactiva]="!p.disponible">
+      <div class="row">
+        <h3 class="font-anton">{{ p.nombre }}</h3>
+        <span class="precio">{{ p.precio | money }}</span>
+      </div>
+      @if (p.descripcion) { <p class="desc">{{ p.descripcion }}</p> }
+      <div class="foot">
+        <span class="vig">{{ p.tipo === 'HAMBURGUESA' ? 'Hamburguesa' : 'Extra' }} @if (!p.disponible) { · oculto }</span>
+        <span class="btns">
+          <button type="button" (click)="editar(p)">Editar</button>
+          <button type="button" class="del" (click)="eliminar(p)">Eliminar</button>
+        </span>
+      </div>
+    </article>
+  } @empty {
+    <p class="info">No hay productos cargados.</p>
+  }
+</div>

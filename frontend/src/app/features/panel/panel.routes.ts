@@ -11,6 +11,7 @@ export const PANEL_ROUTES: Routes = [
       { path: '', redirectTo: 'pedidos', pathMatch: 'full' },
       { path: 'pedidos', loadComponent: () => import('./pages/pedidos/pedidos').then((m) => m.Pedidos) },
       { path: 'ofertas', loadComponent: () => import('./pages/ofertas/ofertas').then((m) => m.Ofertas) },
+      { path: 'carta', loadComponent: () => import('./pages/carta/carta').then((m) => m.Carta) },
       { path: 'informes', loadComponent: () => import('./pages/informes/informes').then((m) => m.Informes) },
     ],
   },
