@@ -1,6 +1,6 @@
 # Sticky Burgers
 
-Sistema de gestión de pedidos para una hamburguesería, con carta y checkout para el cliente y un panel de gestión para el local (pedidos en tiempo real, ofertas e informes de ventas).
+Sistema de gestión de pedidos para una hamburguesería, con carta y checkout para el cliente y un panel de gestión para el local (pedidos en tiempo real, administración de la carta, ofertas e informes de ventas).
 
 El detalle completo del stack, la arquitectura y los objetivos está en [`CLAUDE.md`](./CLAUDE.md).
 
@@ -45,8 +45,10 @@ cd backend
 DB_PORT=5433 ./mvnw spring-boot:run
 ```
 
-Flyway crea el esquema y siembra el menú. Al iniciar se crea el usuario admin si no existe
-(`admin` / `admin123`). Swagger UI en `http://localhost:8080/swagger-ui.html`.
+Flyway crea el esquema y siembra el menú. Al iniciar se crea el usuario admin si no existe,
+tomando las credenciales de las variables de entorno `ADMIN_USERNAME` / `ADMIN_PASSWORD`
+(definí las tuyas antes del primer arranque; no se documentan acá por seguridad). Swagger UI
+en `http://localhost:8080/swagger-ui.html`.
 
 ### 3. Frontend (SPA en `http://localhost:4200`)
 
@@ -70,7 +72,7 @@ docker compose down          # detiene y quita PostgreSQL
 - Máximo 6 hamburguesas por pedido.
 - Medallón extra: +$3500 por unidad.
 - Medios de pago: **efectivo** o **transferencia**, sin recargo. Total = subtotal + envío.
-- Entrega: retiro en local o delivery (costo por distancia, con recargo por lluvia; radio máximo 3 km).
+- Entrega: retiro en local o delivery (el costo de envío lo coordina el local con el cliente).
 - Estados de pedido: `NUEVO → EN_PREPARACION → LISTO → ENTREGADO`.
 
 ## Documentación por módulo
