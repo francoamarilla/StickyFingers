@@ -22,6 +22,13 @@ public class DataInitializer {
                                        StickyProperties props) {
         return args -> {
             String username = props.admin().username();
+            String password = props.admin().password();
+            // Aborta si faltan las credenciales (env vars sin resolver): evita sembrar
+            // un admin inservible con el placeholder crudo o una contraseña vacía.
+            if (isBlank(username) || isBlank(password) || username.contains("${") || password.contains("${")) {
+                throw new IllegalStateException(
+                        "Definí ADMIN_USERNAME y ADMIN_PASSWORD en el entorno antes de arrancar.");
+            }
             if (usuarioRepository.existsByUsername(username)) {
                 return;
             }
@@ -33,5 +40,9 @@ public class DataInitializer {
             usuarioRepository.save(admin);
             log.info("Usuario admin '{}' creado", username);
         };
+    }
+
+    private static boolean isBlank(String s) {
+        return s == null || s.isBlank();
     }
 }
