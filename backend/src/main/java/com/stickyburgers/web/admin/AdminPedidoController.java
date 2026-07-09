@@ -5,6 +5,7 @@ import com.stickyburgers.web.dto.CambiarEstadoRequest;
 import com.stickyburgers.web.dto.PedidoDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,5 +33,12 @@ public class AdminPedidoController {
     public PedidoDto cambiarEstado(@PathVariable Long id,
                                    @RequestBody(required = false) CambiarEstadoRequest request) {
         return pedidoService.cambiarEstado(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Eliminar un pedido (borrado lógico: se oculta del panel y los informes)")
+    public void eliminar(@PathVariable Long id) {
+        pedidoService.eliminar(id);
     }
 }
