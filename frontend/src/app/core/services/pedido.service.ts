@@ -24,4 +24,9 @@ export class PedidoService {
     const body: CambiarEstadoRequest = { estado };
     return this.http.patch<Pedido>(`${this.api}/api/admin/pedidos/${id}/estado`, body);
   }
+
+  /** Admin: borrado lógico, el pedido deja de aparecer en el panel y los informes. */
+  eliminar(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.api}/api/admin/pedidos/${id}`);
+  }
 }

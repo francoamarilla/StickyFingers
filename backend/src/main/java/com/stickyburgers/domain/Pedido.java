@@ -2,6 +2,7 @@ package com.stickyburgers.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -11,6 +12,7 @@ import java.util.List;
 /** Pedido realizado por un cliente. Los importes se calculan en el servidor. */
 @Entity
 @Table(name = "pedido")
+@SQLRestriction("eliminado = false")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -68,6 +70,10 @@ public class Pedido {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EstadoPedido estado;
+
+    /** Borrado lógico: los pedidos marcados no se leen (ver @SQLRestriction). */
+    @Column(nullable = false)
+    private boolean eliminado;
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Builder.Default

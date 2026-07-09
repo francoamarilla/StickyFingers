@@ -98,6 +98,40 @@ class PedidoFlowIntegrationTest {
     }
 
     @Test
+    void eliminarPedidoLoOcultaYNoReciclaElNumero() throws Exception {
+        Map<String, Object> req = Map.of(
+                "clienteNombre", "Ana", "clienteTelefono", "3548",
+                "tipoEntrega", "RETIRO", "medioPago", "EFECTIVO",
+                "items", List.of(Map.of("productoId", burgerId, "cantidad", 1, "medallonExtra", false)));
+        String creado = mvc.perform(post("/api/pedidos").contentType(MediaType.APPLICATION_JSON).content(body(req)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        long id = json.readTree(creado).get("id").asLong();
+
+        String auth = "Bearer " + token();
+        mvc.perform(delete("/api/admin/pedidos/" + id).header("Authorization", auth))
+                .andExpect(status().isNoContent());
+
+        mvc.perform(get("/api/admin/pedidos").header("Authorization", auth))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
+
+        // El eliminado sigue contando: reusar "#001" violaría el UNIQUE de numero.
+        mvc.perform(post("/api/pedidos").contentType(MediaType.APPLICATION_JSON).content(body(req)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.numero").value("#002"));
+    }
+
+    private String token() throws Exception {
+        String resp = mvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body(Map.of("username", "admin", "password", "admin123"))))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        return json.readTree(resp).get("token").asText();
+    }
+
+    @Test
     void loginCredencialesInvalidasDevuelve401() throws Exception {
         mvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

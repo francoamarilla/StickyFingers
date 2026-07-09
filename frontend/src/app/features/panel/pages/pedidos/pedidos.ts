@@ -65,6 +65,16 @@ export class Pedidos {
     });
   }
 
+  eliminar(pedido: Pedido): void {
+    if (!confirm(`¿Eliminar el pedido ${pedido.numero}? No aparecerá más en el panel ni en los informes.`)) {
+      return;
+    }
+    this.pedidoService.eliminar(pedido.id).subscribe({
+      next: () => this.pedidos.update((ps) => ps.filter((x) => x.id !== pedido.id)),
+      error: () => this.snack.open('No se pudo eliminar el pedido', 'OK', { duration: 3000 }),
+    });
+  }
+
   private reemplazar(p: Pedido): void {
     this.pedidos.update((ps) => ps.map((x) => (x.id === p.id ? p : x)));
   }

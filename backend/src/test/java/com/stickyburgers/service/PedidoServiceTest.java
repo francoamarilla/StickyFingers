@@ -53,7 +53,7 @@ class PedidoServiceTest {
     @Test
     void crearCalculaSubtotalTotalYNumero() {
         when(productoService.buscar(1L)).thenReturn(burger(1L, 8000));
-        when(pedidoRepository.count()).thenReturn(0L);
+        when(pedidoRepository.countIncluyendoEliminados()).thenReturn(0L);
 
         var req = new CrearPedidoRequest("Ana", "3548", TipoEntrega.RETIRO, null, null, null,
                 MedioPago.EFECTIVO, null,
@@ -80,7 +80,7 @@ class PedidoServiceTest {
         when(costoEnvioService.haversineKm(any(), any())).thenReturn(new java.math.BigDecimal("2.0"));
         when(costoEnvioService.dentroDelRadio(any())).thenReturn(true);
         when(costoEnvioService.calcular(any(), any(), anyBoolean())).thenReturn(2500);
-        when(pedidoRepository.count()).thenReturn(5L);
+        when(pedidoRepository.countIncluyendoEliminados()).thenReturn(5L);
 
         var req = new CrearPedidoRequest("Ana", "3548", TipoEntrega.DELIVERY, "Centro",
                 new java.math.BigDecimal("-31.42"), new java.math.BigDecimal("-64.18"),
@@ -104,7 +104,7 @@ class PedidoServiceTest {
         // se registra con envío 0 y sin distancia para que el local coordine el envío.
         when(productoService.buscar(1L)).thenReturn(burger(1L, 10000));
         when(costoEnvioService.dentroDelRadio(any())).thenReturn(false);
-        when(pedidoRepository.count()).thenReturn(0L);
+        when(pedidoRepository.countIncluyendoEliminados()).thenReturn(0L);
 
         var req = new CrearPedidoRequest("Ana", "3548", TipoEntrega.DELIVERY, "Calle a mano 123",
                 null, null, MedioPago.EFECTIVO, null,

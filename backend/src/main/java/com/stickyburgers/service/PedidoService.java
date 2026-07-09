@@ -149,8 +149,17 @@ public class PedidoService {
         return dto;
     }
 
+    /** Borrado lógico: el pedido desaparece del panel y de los informes, la fila queda. */
+    @Transactional
+    public void eliminar(Long id) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Pedido " + id + " no encontrado"));
+        pedido.setEliminado(true);
+        pedidoRepository.save(pedido);
+    }
+
     private String siguienteNumero() {
-        long n = pedidoRepository.count() + 1;
+        long n = pedidoRepository.countIncluyendoEliminados() + 1;
         return String.format("#%03d", n);
     }
 
