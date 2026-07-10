@@ -2,6 +2,8 @@
 
 Sistema de gestión de pedidos para una hamburguesería, con carta y checkout para el cliente y un panel de gestión para el local (pedidos en tiempo real, ofertas e informes de ventas).
 
+🍔 **En vivo:** [stickyfingers.me](https://stickyfingers.me)
+
 El detalle completo del stack, la arquitectura y los objetivos está en [`CLAUDE.md`](./CLAUDE.md).
 
 ## Estructura del repositorio
@@ -17,6 +19,14 @@ StickyFingers/
 - **Cliente:** carta, carrito y checkout en `/`.
 - **Panel del local:** en `/panel` (acceso separado, login en `/panel/login`; los clientes no tienen acceso).
 
+## Panel del local
+
+| Pedidos en tiempo real | Gestión de carta |
+| --- | --- |
+| ![Pedidos](./docs/panel-pedidos.png) | ![Carta](./docs/panel-carta.png) |
+| **Ofertas** | **Informes de ventas** |
+| ![Ofertas](./docs/panel-ofertas.png) | ![Informes](./docs/panel-informes.png) |
+
 ## Cómo levantar todo (desarrollo)
 
 Requisitos: **Docker**, **Java 21** y **Node 20+**.
@@ -29,20 +39,11 @@ Desde la raíz del repo:
 docker compose up -d postgres
 ```
 
-> ⚠️ **Puerto 5432 ocupado.** Si ya tenés un PostgreSQL local en el 5432, levantá el
-> contenedor en otro puerto y usá el mismo para el backend:
->
-> ```bash
-> DB_PORT=5433 docker compose up -d postgres
-> ```
-
 ### 2. Backend (API en `http://localhost:8080`)
 
 ```bash
 cd backend
 ./mvnw spring-boot:run
-# si usaste 5433 para la DB:
-DB_PORT=5433 ./mvnw spring-boot:run
 ```
 
 Flyway crea el esquema y siembra el menú. Al iniciar se crea el usuario admin si no existe
