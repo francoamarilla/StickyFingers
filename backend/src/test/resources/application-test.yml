@@ -9,6 +9,10 @@ spring:
       ddl-auto: create-drop
     open-in-view: false
     database-platform: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true   # correr schema.sql (secuencia) después del create-drop
+  sql:
+    init:
+      mode: always
   flyway:
     enabled: false
 

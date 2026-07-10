@@ -61,7 +61,7 @@ class PedidoFlowIntegrationTest {
 
         mvc.perform(post("/api/pedidos").contentType(MediaType.APPLICATION_JSON).content(body(req)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.numero").value("#001"))
+                .andExpect(jsonPath("$.numero").value(org.hamcrest.Matchers.matchesPattern("#\\d{3,}")))
                 .andExpect(jsonPath("$.total").value(16000))
                 .andExpect(jsonPath("$.estado").value("NUEVO"));
     }
@@ -103,10 +103,11 @@ class PedidoFlowIntegrationTest {
                 "clienteNombre", "Ana", "clienteTelefono", "3548",
                 "tipoEntrega", "RETIRO", "medioPago", "EFECTIVO",
                 "items", List.of(Map.of("productoId", burgerId, "cantidad", 1, "medallonExtra", false)));
-        String creado = mvc.perform(post("/api/pedidos").contentType(MediaType.APPLICATION_JSON).content(body(req)))
+        JsonNode creado = json.readTree(mvc.perform(post("/api/pedidos").contentType(MediaType.APPLICATION_JSON).content(body(req)))
                 .andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
-        long id = json.readTree(creado).get("id").asLong();
+                .andReturn().getResponse().getContentAsString());
+        long id = creado.get("id").asLong();
+        String numeroEliminado = creado.get("numero").asText();
 
         String auth = "Bearer " + token();
         mvc.perform(delete("/api/admin/pedidos/" + id).header("Authorization", auth))
@@ -116,10 +117,10 @@ class PedidoFlowIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
 
-        // El eliminado sigue contando: reusar "#001" violaría el UNIQUE de numero.
+        // El número del eliminado no se recicla: reusarlo violaría el UNIQUE de numero.
         mvc.perform(post("/api/pedidos").contentType(MediaType.APPLICATION_JSON).content(body(req)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.numero").value("#002"));
+                .andExpect(jsonPath("$.numero").value(org.hamcrest.Matchers.not(numeroEliminado)));
     }
 
     private String token() throws Exception {

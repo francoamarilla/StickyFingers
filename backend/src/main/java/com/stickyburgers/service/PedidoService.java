@@ -159,8 +159,7 @@ public class PedidoService {
     }
 
     private String siguienteNumero() {
-        long n = pedidoRepository.countIncluyendoEliminados() + 1;
-        return String.format("#%03d", n);
+        return String.format("#%03d", pedidoRepository.siguienteNumeroSecuencia());
     }
 
     private static String textoOrNull(String v) {
