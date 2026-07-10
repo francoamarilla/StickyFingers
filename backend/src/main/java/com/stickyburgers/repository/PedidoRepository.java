@@ -13,11 +13,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     List<Pedido> findByFechaBetweenOrderByFechaDesc(Instant desde, Instant hasta);
 
-    /**
-     * Cuenta también los eliminados. Nativa a propósito: el @SQLRestriction de Pedido filtra
-     * el count() de JPA, y numerar sobre los vivos repetiría el número de un pedido borrado
-     * (la columna es UNIQUE).
-     */
-    @Query(value = "SELECT COUNT(*) FROM pedido", nativeQuery = true)
-    long countIncluyendoEliminados();
+    /** Siguiente número de pedido. Atómico: dos creaciones concurrentes obtienen valores distintos. */
+    @Query(value = "SELECT nextval('pedido_numero_seq')", nativeQuery = true)
+    long siguienteNumeroSecuencia();
 }
