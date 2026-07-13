@@ -1,4 +1,4 @@
-# Sticky Burgers
+# Sticky Fingers
 
 Sistema de gestión de pedidos para una hamburguesería, con carta y checkout para el cliente y un panel de gestión para el local (pedidos en tiempo real, ofertas e informes de ventas).
 
