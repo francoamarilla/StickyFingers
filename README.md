@@ -2,8 +2,6 @@
 
 Sistema de gestión de pedidos para una hamburguesería, con carta y checkout para el cliente y un panel de gestión para el local (pedidos en tiempo real, ofertas e informes de ventas).
 
-🍔 **En vivo:** [stickyfingers.me](https://stickyfingers.me)
-
 El detalle completo del stack, la arquitectura y los objetivos está en [`CLAUDE.md`](./CLAUDE.md).
 
 ## Estructura del repositorio
