@@ -1,34 +1,43 @@
+<div class="seg" role="group" aria-label="Filtrar pedidos">
+  <button type="button" [class.on]="filtro() === 'ACTIVOS'" [attr.aria-pressed]="filtro() === 'ACTIVOS'" (click)="filtro.set('ACTIVOS')">
+    Activos <span class="cuenta">{{ activos().length }}</span>
+  </button>
+  <button type="button" [class.on]="filtro() === 'ENTREGADOS'" [attr.aria-pressed]="filtro() === 'ENTREGADOS'" (click)="filtro.set('ENTREGADOS')">
+    Entregados
+  </button>
+</div>
+
 @if (cargando()) {
-  <p class="info">Cargando pedidos…</p>
-} @else if (pedidos().length === 0) {
-  <p class="info">Todavía no hay pedidos.</p>
+  <p class="info" role="status">Cargando pedidos…</p>
+} @else if (error()) {
+  <div class="info" role="alert">
+    <p>No se pudieron cargar los pedidos.</p>
+    <button type="button" class="ghost" (click)="cargar()">REINTENTAR</button>
+  </div>
+} @else if (visibles().length === 0) {
+  <p class="info">
+    {{ filtro() === 'ACTIVOS' ? 'No hay pedidos activos. Los nuevos aparecen acá solos.' : 'Todavía no hay pedidos entregados.' }}
+  </p>
 } @else {
   <div class="lista">
-    @for (p of pedidos(); track p.id) {
-      <article class="card">
+    @for (p of visibles(); track p.id) {
+      <article class="card" [class]="'estado-' + p.estado">
         <div class="head">
           <span class="num font-anton">{{ p.numero }}</span>
           <span class="hora">{{ p.fecha | date: 'dd/MM · HH:mm' }}</span>
           <span class="spacer"></span>
-          <button
-            type="button"
-            class="chip"
-            [style.color]="estadoInfo(p.estado).color"
-            [style.borderColor]="estadoInfo(p.estado).color + '66'"
-            [style.background]="estadoInfo(p.estado).color + '26'"
-            (click)="avanzar(p)"
-          >
-            {{ estadoInfo(p.estado).label }}
-          </button>
-          <button type="button" class="borrar" aria-label="Eliminar pedido" (click)="eliminar(p)">✕</button>
+          <span class="badge">{{ etiqueta(p.estado) }}</span>
         </div>
 
         <div class="cliente">
           <b>{{ p.clienteNombre }}</b>
-          <span class="sep">·</span>
-          <span class="entrega">
-            {{ p.tipoEntrega === 'DELIVERY' ? 'Delivery · ' + p.direccion : 'Retiro en local' }}
-          </span>
+          <a class="tel" [href]="'tel:' + p.clienteTelefono">
+            <span class="material-icons" aria-hidden="true">call</span>{{ p.clienteTelefono }}
+          </a>
+        </div>
+        <div class="entrega">
+          <span class="material-icons" aria-hidden="true">{{ p.tipoEntrega === 'DELIVERY' ? 'delivery_dining' : 'storefront' }}</span>
+          {{ p.tipoEntrega === 'DELIVERY' ? p.direccion : 'Retiro en local' }}
         </div>
 
         <ul class="items">
@@ -40,9 +49,29 @@
           }
         </ul>
 
+        @if (p.notaGeneral) {
+          <p class="nota">“{{ p.notaGeneral }}”</p>
+        }
+
         <div class="foot">
-          <span class="pago">{{ p.medioPago === 'EFECTIVO' ? 'Efectivo' : 'Transferencia' }}</span>
+          <span class="pago">
+            {{ p.medioPago === 'EFECTIVO' ? 'Efectivo' : 'Transferencia' }}
+            @if (p.tipoEntrega === 'DELIVERY') {
+              · Envío {{ p.costoEnvio > 0 ? (p.costoEnvio | money) : 'a coordinar' }}
+            }
+          </span>
           <span class="total font-anton">{{ p.total | money }}</span>
+        </div>
+
+        <div class="acciones">
+          <button type="button" class="eliminar" (click)="eliminar(p)" [attr.aria-label]="'Eliminar pedido ' + p.numero">
+            Eliminar
+          </button>
+          @if (accion(p.estado); as a) {
+            <button type="button" class="avanzar font-anton" [disabled]="enCurso().has(p.id)" (click)="avanzar(p)">
+              {{ a }}
+            </button>
+          }
         </div>
       </article>
     }

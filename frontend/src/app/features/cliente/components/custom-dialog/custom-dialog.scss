@@ -23,8 +23,12 @@ header {
   .close {
     background: none;
     border: none;
-    color: var(--sticky-dim);
-    font-size: 18px;
+    color: var(--sticky-muted);
+    width: 44px;
+    height: 44px;
+    margin: -10px -10px 0 0;
+    display: grid;
+    place-items: center;
     cursor: pointer;
   }
 }
@@ -38,7 +42,7 @@ header {
 
 .label {
   display: block;
-  color: var(--sticky-red);
+  color: var(--sticky-red-text);
   font-size: 14px;
   letter-spacing: 1px;
   margin-bottom: 8px;
@@ -58,8 +62,10 @@ header {
     background: none;
     border: none;
     color: var(--sticky-cream);
-    font-size: 22px;
+    display: grid;
+    place-items: center;
     cursor: pointer;
+    &:disabled { color: var(--sticky-dim); cursor: not-allowed; }
   }
 
   .qty {
@@ -104,7 +110,7 @@ header {
     background: var(--sticky-yellow);
     color: var(--sticky-bg);
     flex-shrink: 0;
-    font-weight: 700;
+    .material-icons { font-size: 18px; }
   }
 
   &:not(.on) .check {

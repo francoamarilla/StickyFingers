@@ -34,6 +34,20 @@ export class Checkout {
   // El envío se coordina con el cliente; el total mostrado es el subtotal.
   readonly total = computed(() => this.cart.subtotal());
 
+  /** Qué le falta completar al cliente; null si el formulario está listo. */
+  readonly faltante = computed(() => {
+    if (!this.nombre().trim()) {
+      return 'Completá tu nombre para confirmar';
+    }
+    if (!this.telefono().trim()) {
+      return 'Completá tu teléfono para confirmar';
+    }
+    if (this.esDelivery() && !this.direccion().trim()) {
+      return 'Completá la dirección de entrega';
+    }
+    return null;
+  });
+
   readonly puedeConfirmar = computed(() => {
     if (this.cart.vacio() || !this.nombre().trim() || !this.telefono().trim()) {
       return false;

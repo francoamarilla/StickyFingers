@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NgOptimizedImage } from '@angular/common';
 import { AuthService } from '../../../core/auth/auth.service';
 import { RealtimeService } from '../../../core/services/realtime.service';
 
 @Component({
   selector: 'app-panel-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgOptimizedImage],
   templateUrl: './panel-shell.html',
   styleUrl: './panel-shell.scss',
 })

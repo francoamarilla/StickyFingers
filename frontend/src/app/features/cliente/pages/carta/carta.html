@@ -1,12 +1,12 @@
 <div class="page">
   <header class="topbar">
-    <img src="logo.png" alt="Sticky Burgers" class="logo" />
+    <img ngSrc="logo-192.png" width="56" height="56" priority alt="Sticky Burgers" class="logo" />
     <div class="brand">
       <span class="font-anton">STICKY <span class="red">BURGERS</span></span>
       <small>Hamburguesas artesanales</small>
     </div>
     <button type="button" class="cart-btn" (click)="verPedido()" aria-label="Ver pedido">
-      🛒
+      <span class="material-icons" aria-hidden="true">shopping_bag</span>
       @if (cart.cantidadItems() > 0) {
         <span class="badge">{{ cart.cantidadItems() }}</span>
       }
@@ -15,12 +15,13 @@
 
   <main>
     <div class="aviso">
-      🔥 Todo se cocina en el momento. Máximo
-      <b>{{ maxHamburguesas }} hamburguesas</b> por pedido.
+      <span class="material-icons" aria-hidden="true">local_fire_department</span>
+      <span>Todo se cocina en el momento. Máximo
+      <b>{{ maxHamburguesas }} hamburguesas</b> por pedido.</span>
     </div>
 
     @if (ofertas().length > 0) {
-      <h2 class="seccion ofertas-tit font-anton">🔥 OFERTAS</h2>
+      <h2 class="seccion ofertas-tit font-anton">OFERTAS</h2>
       <div class="lista">
         @for (o of ofertas(); track o.id) {
           <article class="card oferta">
@@ -34,13 +35,21 @@
               @if (cantidadOfertaEnPedido(o) > 0) {
                 <span class="en-pedido">{{ cantidadOfertaEnPedido(o) }} en pedido</span>
               }
-              <button type="button" class="add" (click)="agregarOferta(o)">AGREGAR +</button>
+              <button type="button" class="add" (click)="agregarOferta(o)" [attr.aria-label]="'Agregar ' + o.titulo">AGREGAR</button>
             </div>
           </article>
         }
       </div>
     }
 
+    @if (cargando()) {
+      <p class="estado" role="status">Cargando la carta…</p>
+    } @else if (error()) {
+      <div class="estado" role="alert">
+        <p>No pudimos cargar la carta. Revisá tu conexión e intentá de nuevo.</p>
+        <button type="button" class="reintentar" (click)="reintentar()">REINTENTAR</button>
+      </div>
+    } @else {
     <h2 class="seccion font-anton">HAMBURGUESAS</h2>
     <div class="lista">
       @for (b of hamburguesas(); track b.id) {
@@ -54,11 +63,11 @@
             @if (cantidadEnPedido(b) > 0) {
               <span class="en-pedido">{{ cantidadEnPedido(b) }} en pedido</span>
             }
-            <button type="button" class="add" (click)="abrirCustom(b)">AGREGAR +</button>
+            <button type="button" class="add" (click)="abrirCustom(b)" [attr.aria-label]="'Agregar ' + b.nombre">AGREGAR</button>
           </div>
         </article>
       } @empty {
-        <p class="vacio">Cargando la carta…</p>
+        <p class="estado">No hay hamburguesas disponibles en este momento.</p>
       }
     </div>
 
@@ -69,10 +78,13 @@
           <article class="card extra">
             <span class="nombre">{{ e.nombre }}</span>
             <span class="precio">{{ e.precio | money }}</span>
-            <button type="button" class="add-mini" (click)="agregarExtra(e)" aria-label="Agregar">+</button>
+            <button type="button" class="add-mini" (click)="agregarExtra(e)" [attr.aria-label]="'Agregar ' + e.nombre">
+              <span class="material-icons" aria-hidden="true">add</span>
+            </button>
           </article>
         }
       </div>
+    }
     }
   </main>
 
@@ -81,7 +93,8 @@
       <button type="button" class="ver font-anton" (click)="verPedido()">
         VER PEDIDO · {{ cart.cantidadItems() }}
         <span class="sep"></span>
-        {{ cart.subtotal() | money }} →
+        {{ cart.subtotal() | money }}
+        <span class="material-icons" aria-hidden="true">arrow_forward</span>
       </button>
     </footer>
   }

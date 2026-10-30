@@ -29,7 +29,7 @@
     flex-direction: column;
     flex: 1;
     span { font-size: 18px; }
-    .red { color: var(--sticky-red); }
+    .red { color: var(--sticky-red-text); }
     small { color: var(--sticky-muted); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; }
   }
 
@@ -40,7 +40,9 @@
     border-radius: 12px;
     background: var(--sticky-surface-2);
     border: 1px solid var(--sticky-border);
-    font-size: 18px;
+    color: var(--sticky-cream);
+    display: grid;
+    place-items: center;
     cursor: pointer;
 
     .badge {
@@ -74,11 +76,16 @@ main {
   font-size: 12.5px;
   color: #d8cfc2;
   margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 1.4;
   b { color: var(--sticky-yellow); font-weight: 600; }
+  .material-icons { color: var(--sticky-red-text); font-size: 20px; }
 }
 
 .seccion {
-  color: var(--sticky-red);
+  color: var(--sticky-red-text);
   font-size: 16px;
   letter-spacing: 1.5px;
   margin: 0 0 12px 2px;
@@ -122,8 +129,10 @@ main {
       color: #fff;
       border: none;
       border-radius: 11px;
-      padding: 9px 18px;
+      padding: 11px 20px;
+      min-height: 44px;
       font-weight: 600;
+      letter-spacing: 0.5px;
       font-size: 14px;
       cursor: pointer;
     }
@@ -154,8 +163,10 @@ main {
   .nombre { flex: 1; font-weight: 600; text-transform: uppercase; }
   .precio { color: var(--sticky-yellow); font-weight: 700; }
   .add-mini {
-    width: 34px;
-    height: 34px;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
     border-radius: 10px;
     background: var(--sticky-red);
     color: #fff;
@@ -165,7 +176,22 @@ main {
   }
 }
 
-.vacio { color: var(--sticky-dim); text-align: center; padding: 40px 0; }
+.estado {
+  color: var(--sticky-muted);
+  text-align: center;
+  padding: 40px 8px;
+  p { margin: 0 0 16px; }
+}
+
+.reintentar {
+  background: transparent;
+  color: var(--sticky-cream);
+  border: 1px solid var(--sticky-border);
+  border-radius: 11px;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
 
 .barra {
   position: sticky;
