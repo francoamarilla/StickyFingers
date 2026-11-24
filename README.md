@@ -1,80 +1,93 @@
-# Sticky Burgers
+# Sticky Fingers — Online Food Ordering System
 
-Sistema de gestión de pedidos para una hamburguesería, con carta y checkout para el cliente y un panel de gestión para el local (pedidos en tiempo real, ofertas e informes de ventas).
+Full-stack food ordering platform featuring a digital menu, shopping cart, checkout and an administrative panel with real-time order updates.
 
-🍔 **En vivo:** [stickyfingers.me](https://stickyfingers.me)
+The system incorporates WebSocket and STOMP communication, backend business-rule validation, automated tests and an architecture designed for containerized deployment.
 
-El detalle completo del stack, la arquitectura y los objetivos está en [`CLAUDE.md`](./CLAUDE.md).
+[Versión en español](README.es.md)
 
-## Estructura del repositorio
+## Features
 
-```text
-StickyFingers/
-├── backend/            # API REST — Spring Boot 3 / Java 21
-├── frontend/           # SPA — Angular 22 (cliente + panel del local)
-├── docker-compose.yml  # PostgreSQL
-└── CLAUDE.md           # Stack tecnológico, arquitectura y buenas prácticas
-```
+- **Customer:** menu, cart, guest checkout, pickup or delivery.
+- **Admin panel:** real-time orders, menu management, offers and sales reports.
+- **Backend:** catalog-based price calculation, delivery rules, order numbering and soft deletion.
+- **Security:** administrative API protected by JWT and the ADMIN role.
 
-- **Cliente:** carta, carrito y checkout en `/`.
-- **Panel del local:** en `/panel` (acceso separado, login en `/panel/login`; los clientes no tienen acceso).
+## Admin panel
 
-## Panel del local
-
-| Pedidos en tiempo real | Gestión de carta |
+| Real-time orders | Menu management |
 | --- | --- |
-| ![Pedidos](./docs/panel-pedidos.png) | ![Carta](./docs/panel-carta.png) |
-| **Ofertas** | **Informes de ventas** |
-| ![Ofertas](./docs/panel-ofertas.png) | ![Informes](./docs/panel-informes.png) |
+| ![Orders](docs/panel-pedidos.png) | ![Menu](docs/panel-carta.png) |
+| **Offers** | **Sales reports** |
+| ![Offers](docs/panel-ofertas.png) | ![Reports](docs/panel-informes.png) |
 
-## Cómo levantar todo (desarrollo)
+## Architecture
 
-Requisitos: **Docker**, **Java 21** y **Node 20+**.
-
-### 1. Base de datos (PostgreSQL)
-
-Desde la raíz del repo:
-
-```bash
-docker compose up -d postgres
+```mermaid
+flowchart TD
+    C[Customer: menu and checkout] -->|REST| A[Spring Boot]
+    P[Angular admin panel] -->|REST + JWT| A
+    A --> S[Services / business rules]
+    S --> R[Spring Data JPA]
+    R --> D[(PostgreSQL)]
+    S --> E[Event publisher]
+    E -->|WebSocket + STOMP| P
 ```
 
-### 2. Backend (API en `http://localhost:8080`)
+The REST API handles operations. New order and status-change events update the panel without reloading the page.
 
-```bash
-cd backend
-./mvnw spring-boot:run
-```
+[Architecture](docs/en/architecture.md) · [Real-time communication](docs/en/realtime.md)
 
-Flyway crea el esquema y siembra el menú. Al iniciar se crea el usuario admin si no existe
-(`admin` / `admin123`). Swagger UI en `http://localhost:8080/swagger-ui.html`.
+## Business rules
 
-### 3. Frontend (SPA en `http://localhost:4200`)
+The server recalculates totals using catalog prices. The six-burger limit applies to the relevant product lines. Delivery is calculated by distance when valid coordinates are within the configured radius; otherwise delivery remains pending coordination. Orders use sequence-based numbering and soft deletion.
 
-```bash
-cd frontend
-npm install   # solo la primera vez
-npm start     # = ng serve
-```
+[Business rules](docs/en/business-rules.md)
 
-Abrir `http://localhost:4200` (cliente) y `http://localhost:4200/panel` (panel, login admin).
+## Testing
 
-### Bajar todo
+Unit tests with JUnit 5 and Mockito, and API integration tests with Spring Boot Test, MockMvc and H2. They cover price calculations, delivery, validation, events, authentication and soft deletion. JaCoCo is configured to generate coverage reports.
 
-```bash
-docker compose down          # detiene y quita PostgreSQL
-# cortar backend y ng serve con Ctrl+C en sus terminales
-```
+[Testing and execution](docs/en/testing.md)
 
-## Reglas de negocio clave
+## Tech stack
 
-- Máximo 6 hamburguesas por pedido.
-- Medallón extra: +$3500 por unidad.
-- Medios de pago: **efectivo** o **transferencia**, sin recargo. Total = subtotal + envío.
-- Entrega: retiro en local o delivery (costo por distancia, con recargo por lluvia; radio máximo 3 km).
-- Estados de pedido: `NUEVO → EN_PREPARACION → LISTO → ENTREGADO`.
+| Layer | Technologies |
+|---|---|
+| Backend | Java 21, Spring Boot 3.3.5, Spring Data JPA, MapStruct |
+| Frontend | Angular 22, TypeScript, Angular Material, RxJS, Signals |
+| Security | Spring Security, JWT, BCrypt |
+| Real-time | WebSocket, STOMP, SockJS |
+| Data | PostgreSQL 16, Flyway |
+| Testing | JUnit 5, Mockito, Spring Boot Test, H2, JaCoCo |
+| API | Swagger/OpenAPI |
+| Infrastructure | Docker, Docker Compose, nginx |
 
-## Documentación por módulo
+## Local setup
 
-- Backend: [`backend/README.md`](./backend/README.md) — endpoints, variables de entorno, tests.
-- Stack y arquitectura: [`CLAUDE.md`](./CLAUDE.md).
+Requirements: Docker with Compose, Java 21 and Node.js 22.22.3 or later compatible with Angular 22.
+
+1. Start PostgreSQL with `docker compose up -d postgres`.
+2. Configure ADMIN_USERNAME, ADMIN_PASSWORD and a local JWT_SECRET; run the backend with `./mvnw spring-boot:run`.
+3. In frontend, install dependencies with `npm install` and run `npm start`.
+
+Customer: http://localhost:4200 · Panel: http://localhost:4200/panel · API: http://localhost:8080/swagger-ui.html
+
+[Setup guide](docs/en/setup.md) · [Deployment](docs/en/deployment.md)
+
+## Project status
+
+Portfolio application deployed to a Linux VPS using containers and HTTPS, without commercial usage. Current public demo availability is not claimed. A security review must be completed before commercial operation.
+
+## Documentation
+
+- [Architecture](docs/en/architecture.md)
+- [Real-time communication](docs/en/realtime.md)
+- [Business rules](docs/en/business-rules.md)
+- [Testing](docs/en/testing.md)
+- [Setup](docs/en/setup.md)
+- [Deployment](docs/en/deployment.md)
+
+CLAUDE.md and DEPLOY.md preserve historical planning context (Spanish). The guides above describe the current implementation and configuration.
+
+[Portfolio](https://francoamarilla.github.io/portfolio/) · [LinkedIn](https://www.linkedin.com/in/franco-maximiliano-amarilla/)
