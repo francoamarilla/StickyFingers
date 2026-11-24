@@ -11,7 +11,7 @@ The system incorporates WebSocket and STOMP communication, backend business-rule
 - **Customer:** menu, cart, guest checkout, pickup or delivery.
 - **Admin panel:** real-time orders, menu management, offers and sales reports.
 - **Backend:** catalog-based price calculation, delivery rules, order numbering and soft deletion.
-- **Security:** administrative API protected by JWT and the ADMIN role.
+- **Security:** administrative API protected by JWT and the ADMIN role. The STOMP channel uses the same JWT on CONNECT: only ADMIN can connect and subscribe, client SEND is blocked, and events carry only the order id and status.
 
 ## Admin panel
 
@@ -31,10 +31,10 @@ flowchart TD
     S --> R[Spring Data JPA]
     R --> D[(PostgreSQL)]
     S --> E[Event publisher]
-    E -->|WebSocket + STOMP| P
+    E -->|STOMP + JWT: id and status| P
 ```
 
-The REST API handles operations. New order and status-change events update the panel without reloading the page.
+The REST API handles operations. After each commit, new-order and status-change events notify the panel, which fetches details through the protected REST API and updates without reloading the page.
 
 [Architecture](docs/en/architecture.md) · [Real-time communication](docs/en/realtime.md)
 
@@ -46,7 +46,7 @@ The server recalculates totals using catalog prices. The six-burger limit applie
 
 ## Testing
 
-Unit tests with JUnit 5 and Mockito, and API integration tests with Spring Boot Test, MockMvc and H2. They cover price calculations, delivery, validation, events, authentication and soft deletion. JaCoCo is configured to generate coverage reports.
+Unit tests with JUnit 5 and Mockito, and API integration tests with Spring Boot Test, MockMvc and H2. They cover price calculations, delivery, validation, events, authentication and soft deletion, plus STOMP security integration tests (authentication, ADMIN authorization, token expiration, after-commit publishing) and Vitest specs for the panel's real-time sync. JaCoCo is configured to generate coverage reports.
 
 [Testing and execution](docs/en/testing.md)
 
@@ -77,7 +77,7 @@ Customer: http://localhost:4200 · Panel: http://localhost:4200/panel · API: ht
 
 ## Project status
 
-Portfolio application deployed to a Linux VPS using containers and HTTPS, without commercial usage. Current public demo availability is not claimed. A security review must be completed before commercial operation.
+Portfolio application. It was previously deployed to a Linux VPS using containers and HTTPS, without commercial usage, and is not currently deployed. A security review must be completed before commercial operation.
 
 ## Documentation
 

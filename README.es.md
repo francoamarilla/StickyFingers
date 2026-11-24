@@ -11,7 +11,7 @@ El sistema incorpora comunicación mediante WebSockets y STOMP, validación de r
 - **Cliente:** catálogo, carrito, checkout sin cuenta, retiro o delivery.
 - **Panel administrativo:** pedidos en tiempo real, gestión de carta, ofertas e informes de ventas.
 - **Backend:** cálculo de importes a partir del catálogo, reglas de entrega, numeración y baja lógica de pedidos.
-- **Seguridad:** API administrativa protegida con JWT y rol ADMIN.
+- **Seguridad:** API administrativa protegida con JWT y rol ADMIN. El canal STOMP usa el mismo JWT en el CONNECT: solo ADMIN puede conectarse y suscribirse, el SEND de clientes está bloqueado y los eventos solo llevan el id y el estado del pedido.
 
 ## Panel del local
 
@@ -31,10 +31,10 @@ flowchart TD
     S --> R[Spring Data JPA]
     R --> D[(PostgreSQL)]
     S --> E[Publicador de eventos]
-    E -->|WebSocket + STOMP| P
+    E -->|STOMP + JWT: id y estado| P
 ```
 
-La API REST gestiona las operaciones. Los eventos de nuevos pedidos y cambios de estado actualizan el panel sin recargar la página.
+La API REST gestiona las operaciones. Después de cada commit, los eventos de nuevos pedidos y cambios de estado notifican al panel, que pide el detalle por la API REST protegida y se actualiza sin recargar la página.
 
 [Arquitectura](docs/architecture.md) · [Comunicación en tiempo real](docs/realtime.md)
 
@@ -46,7 +46,7 @@ El servidor recalcula importes con precios del catálogo. El límite de seis ham
 
 ## Testing
 
-Pruebas unitarias con JUnit 5 y Mockito, e integración de API con Spring Boot Test, MockMvc y H2. Incluyen cálculos de importes, entrega, validaciones, eventos, autenticación y eliminación lógica. JaCoCo está configurado para generar reportes de cobertura.
+Pruebas unitarias con JUnit 5 y Mockito, e integración de API con Spring Boot Test, MockMvc y H2. Incluyen cálculos de importes, entrega, validaciones, eventos, autenticación y eliminación lógica, además de pruebas de integración de seguridad STOMP (autenticación, autorización ADMIN, vencimiento del token, publicación después del commit) y specs de Vitest para la sincronización en tiempo real del panel. JaCoCo está configurado para generar reportes de cobertura.
 
 [Pruebas y ejecución](docs/testing.md)
 
@@ -77,7 +77,7 @@ Cliente: http://localhost:4200 · Panel: http://localhost:4200/panel · API: htt
 
 ## Estado del proyecto
 
-Aplicación de portfolio desplegada en un VPS Linux mediante contenedores y HTTPS, sin uso comercial. No se afirma disponibilidad actual de una demo pública. Antes de una puesta en funcionamiento comercial corresponde completar la revisión de seguridad.
+Aplicación de portfolio. Estuvo desplegada en un VPS Linux mediante contenedores y HTTPS, sin uso comercial, y actualmente no está desplegada. Antes de una puesta en funcionamiento comercial corresponde completar la revisión de seguridad.
 
 ## Documentación
 
