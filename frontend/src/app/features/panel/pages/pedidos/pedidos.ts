@@ -1,4 +1,5 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { EMPTY, Subject, catchError, map, mergeMap, of, switchMap, tap } from 'rxjs';
 import { DatePipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -34,7 +35,6 @@ export class Pedidos {
   private readonly pedidoService = inject(PedidoService);
   private readonly realtime = inject(RealtimeService);
   private readonly snack = inject(MatSnackBar);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly pedidos = signal<Pedido[]>([]);
   readonly cargando = signal(true);
@@ -48,33 +48,83 @@ export class Pedidos {
     this.filtro() === 'ACTIVOS' ? this.activos() : this.pedidos().filter((p) => p.estado === 'ENTREGADO'),
   );
 
+  /**
+   * Cambios locales recientes, cada uno con un número de secuencia. Una respuesta REST pedida
+   * en la secuencia N no pisa los cambios con secuencia mayor a N: esos son más nuevos que ella.
+   * ponytail: crece con los pedidos tocados en la sesión del panel (decenas por día); podar si molesta.
+   */
+  private seq = 0;
+  private readonly cambios = new Map<number, Cambio>();
+  /** Pedidos de carga completa. switchMap deja una sola en vuelo: la más reciente. */
+  private readonly recarga$ = new Subject<void>();
+
   constructor() {
+    this.recarga$
+      .pipe(
+        switchMap(() => {
+          const desde = this.seq;
+          return this.pedidoService.listar().pipe(
+            map((foto) => ({ foto, desde })),
+            catchError(() => of(null)),
+          );
+        }),
+        takeUntilDestroyed(),
+      )
+      .subscribe((r) => {
+        if (r) {
+          this.pedidos.update((local) => this.fusionar(r.foto, local, r.desde));
+          this.error.set(false);
+        } else if (this.cargando()) {
+          this.error.set(true);
+        } else {
+          this.snack.open('No se pudieron actualizar los pedidos', 'OK', { duration: 3000 });
+        }
+        this.cargando.set(false);
+      });
+
     this.cargar();
 
-    this.realtime.onPedidoNuevo().pipe(takeUntilDestroyed()).subscribe((p) => {
-      this.pedidos.update((ps) => [p, ...ps.filter((x) => x.id !== p.id)]);
-      this.snack.open(`Nuevo pedido ${p.numero}`, 'OK', { duration: 3000 });
-    });
+    this.realtime
+      .onPedidoNuevo()
+      .pipe(
+        tap((e) => this.registrar(e.id, {})),
+        // desde se toma después de registrar el evento: solo cuentan los cambios posteriores.
+        mergeMap((e) => {
+          const desde = this.seq;
+          return this.pedidoService.obtener(e.id).pipe(
+            map((p) => ({ p, desde })),
+            catchError(() => EMPTY),
+          );
+        }),
+        takeUntilDestroyed(),
+      )
+      .subscribe(({ p, desde }) => {
+        const actual = this.aplicar(p, desde);
+        if (actual) {
+          this.pedidos.update((ps) => [actual, ...ps.filter((x) => x.id !== p.id)]);
+          this.snack.open(`Nuevo pedido ${p.numero}`, 'OK', { duration: 3000 });
+        }
+      });
 
-    this.realtime.onEstadoCambiado().pipe(takeUntilDestroyed()).subscribe((p) => this.reemplazar(p));
+    this.realtime
+      .onEstadoCambiado()
+      .pipe(takeUntilDestroyed())
+      .subscribe((e) => {
+        this.registrar(e.id, { estado: e.estado });
+        this.pedidos.update((ps) => ps.map((x) => (x.id === e.id ? { ...x, estado: e.estado } : x)));
+      });
+
+    // Tras una caída de la conexión se pudieron perder eventos: resincronizar en segundo plano.
+    this.realtime
+      .onReconectado()
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.recarga$.next());
   }
 
   cargar(): void {
     this.cargando.set(true);
     this.error.set(false);
-    this.pedidoService
-      .listar()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (ps) => {
-          this.pedidos.set(ps);
-          this.cargando.set(false);
-        },
-        error: () => {
-          this.cargando.set(false);
-          this.error.set(true);
-        },
-      });
+    this.recarga$.next();
   }
 
   etiqueta(estado: EstadoPedido): string {
@@ -91,10 +141,14 @@ export class Pedidos {
 
   avanzar(pedido: Pedido): void {
     this.marcar(pedido.id, true);
+    const desde = this.seq;
     this.pedidoService.cambiarEstado(pedido.id).subscribe({
       next: (p) => {
         this.marcar(pedido.id, false);
-        this.reemplazar(p);
+        const actual = this.aplicar(p, desde);
+        if (actual) {
+          this.reemplazar(actual);
+        }
       },
       error: () => {
         this.marcar(pedido.id, false);
@@ -108,7 +162,10 @@ export class Pedidos {
       return;
     }
     this.pedidoService.eliminar(pedido.id).subscribe({
-      next: () => this.pedidos.update((ps) => ps.filter((x) => x.id !== pedido.id)),
+      next: () => {
+        this.registrar(pedido.id, { eliminado: true });
+        this.pedidos.update((ps) => ps.filter((x) => x.id !== pedido.id));
+      },
       error: () => this.snack.open('No se pudo eliminar el pedido', 'OK', { duration: 3000 }),
     });
   }
@@ -128,4 +185,38 @@ export class Pedidos {
   private reemplazar(p: Pedido): void {
     this.pedidos.update((ps) => ps.map((x) => (x.id === p.id ? p : x)));
   }
+
+  private registrar(id: number, cambio: Omit<Cambio, 'seq'>): void {
+    this.cambios.set(id, { ...this.cambios.get(id), ...cambio, seq: ++this.seq });
+  }
+
+  /** Aplica a una respuesta REST los cambios posteriores a su envío; null si se eliminó después. */
+  private aplicar(p: Pedido, desde: number): Pedido | null {
+    const c = this.cambios.get(p.id);
+    if (!c || c.seq <= desde) {
+      return p;
+    }
+    if (c.eliminado) {
+      return null;
+    }
+    return c.estado ? { ...p, estado: c.estado } : p;
+  }
+
+  /**
+   * Usa la lista REST como base sin perder lo más nuevo: le aplica los cambios posteriores a
+   * la consulta y conserva los pedidos locales tocados después que la lista no trae.
+   */
+  private fusionar(foto: Pedido[], local: Pedido[], desde: number): Pedido[] {
+    const enFoto = new Set(foto.map((p) => p.id));
+    const recientes = local.filter((p) => !enFoto.has(p.id) && (this.cambios.get(p.id)?.seq ?? 0) > desde);
+    const base = foto.map((p) => this.aplicar(p, desde)).filter((p): p is Pedido => p !== null);
+    return [...recientes, ...base];
+  }
+}
+
+/** Cambio local conocido de un pedido (evento WS o acción del panel). */
+interface Cambio {
+  seq: number;
+  estado?: EstadoPedido;
+  eliminado?: boolean;
 }

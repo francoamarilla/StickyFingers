@@ -133,6 +133,24 @@ class PedidoFlowIntegrationTest {
     }
 
     @Test
+    void obtenerPedidoAdminExigeTokenYDevuelveElDetalle() throws Exception {
+        Map<String, Object> req = Map.of(
+                "clienteNombre", "Ana", "clienteTelefono", "3548",
+                "tipoEntrega", "RETIRO", "medioPago", "EFECTIVO",
+                "items", List.of(Map.of("productoId", burgerId, "cantidad", 1, "medallonExtra", false)));
+        long id = json.readTree(mvc.perform(post("/api/pedidos").contentType(MediaType.APPLICATION_JSON).content(body(req)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString()).get("id").asLong();
+
+        mvc.perform(get("/api/admin/pedidos/" + id)).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/admin/pedidos/" + id).header("Authorization", "Bearer " + token()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.clienteNombre").value("Ana"));
+        mvc.perform(get("/api/admin/pedidos/999999").header("Authorization", "Bearer " + token()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void loginCredencialesInvalidasDevuelve401() throws Exception {
         mvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

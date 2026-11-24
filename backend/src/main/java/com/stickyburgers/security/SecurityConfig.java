@@ -46,6 +46,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/menu", "/api/ofertas", "/api/config").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/pedidos").permitAll()
+                        // Handshake WebSocket/SockJS público a nivel HTTP: el navegador no puede mandar
+                        // Authorization ahí. JWT y rol ADMIN se exigen por frame STOMP (WebSocketConfig).
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

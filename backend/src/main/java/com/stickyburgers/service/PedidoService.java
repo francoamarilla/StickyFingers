@@ -138,6 +138,11 @@ public class PedidoService {
         return pedidoRepository.findAllByOrderByFechaDesc().stream().map(mapper::toDto).toList();
     }
 
+    public PedidoDto obtener(Long id) {
+        return pedidoRepository.findById(id).map(mapper::toDto)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Pedido " + id + " no encontrado"));
+    }
+
     @Transactional
     public PedidoDto cambiarEstado(Long id, CambiarEstadoRequest req) {
         Pedido pedido = pedidoRepository.findById(id)

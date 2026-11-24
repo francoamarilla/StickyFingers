@@ -28,6 +28,12 @@ public class AdminPedidoController {
         return pedidoService.listar();
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Obtener un pedido (el panel lo usa al recibir el evento de pedido nuevo)")
+    public PedidoDto obtener(@PathVariable Long id) {
+        return pedidoService.obtener(id);
+    }
+
     @PatchMapping("/{id}/estado")
     @Operation(summary = "Cambiar el estado de un pedido (si no se indica, avanza al siguiente)")
     public PedidoDto cambiarEstado(@PathVariable Long id,

@@ -55,10 +55,22 @@ API REST del sistema de pedidos. Arquitectura por capas `Controller → Service 
 **Públicos:** `GET /api/menu` · `GET /api/ofertas` · `POST /api/pedidos` · `POST /api/auth/login`
 
 **Admin (rol ADMIN, requiere `Authorization: Bearer <jwt>`):**
-`/api/admin/productos` (ABM) · `/api/admin/pedidos` (listar, `PATCH /{id}/estado`) ·
+`/api/admin/productos` (ABM) · `/api/admin/pedidos` (listar, `GET /{id}`, `PATCH /{id}/estado`) ·
 `/api/admin/ofertas` (ABM) · `GET /api/admin/informes?rango=DIA|SEMANA|MES`
 
-**WebSocket (STOMP):** endpoint `/ws`, topics `/topic/pedidos-nuevos` y `/topic/pedidos-estado`.
+**WebSocket (STOMP):** endpoint `/ws` (SockJS), topics `/topic/pedidos-nuevos` y `/topic/pedidos-estado`.
+
+- Solo para el admin. El JWT del login va en el frame CONNECT como header STOMP
+  `Authorization: Bearer <jwt>` (nunca en la URL). Sin token válido o sin rol `ADMIN`, el servidor
+  responde `ERROR` y cierra la conexión.
+- Deny by default: solo se permite suscribirse a esos dos topics exactos (sin comodines). Los
+  clientes no pueden hacer `SEND`.
+- Cuando vence el token, la sesión no recibe más mensajes: el primer evento posterior se
+  reemplaza por un `ERROR` y se cierra la sesión.
+- Los eventos solo llevan `{ "id", "estado" }` y se publican después del commit. El panel pide el
+  detalle por `GET /api/admin/pedidos/{id}`.
+- No activar `TRACE` en `org.springframework.messaging` en producción: podría loguear los
+  headers del CONNECT.
 
 ## Reglas de negocio
 

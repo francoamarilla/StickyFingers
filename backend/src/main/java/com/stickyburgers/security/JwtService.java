@@ -1,6 +1,7 @@
 package com.stickyburgers.security;
 
 import com.stickyburgers.config.StickyProperties;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
@@ -38,9 +39,14 @@ public class JwtService {
 
     /** @return el username (subject) si el token es válido; null si es inválido o expiró. */
     public String extraerUsername(String token) {
+        Claims claims = validar(token);
+        return claims == null ? null : claims.getSubject();
+    }
+
+    /** @return los claims si la firma es válida y no expiró; null en cualquier otro caso. */
+    public Claims validar(String token) {
         try {
-            return Jwts.parser().verifyWith(key).build()
-                    .parseSignedClaims(token).getPayload().getSubject();
+            return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
         } catch (Exception e) {
             return null;
         }

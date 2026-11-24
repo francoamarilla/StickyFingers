@@ -19,6 +19,11 @@ export class PedidoService {
     return this.http.get<Pedido[]>(`${this.api}/api/admin/pedidos`);
   }
 
+  /** Admin: detalle de un pedido (al recibir el evento de pedido nuevo). */
+  obtener(id: number): Observable<Pedido> {
+    return this.http.get<Pedido>(`${this.api}/api/admin/pedidos/${id}`);
+  }
+
   /** Admin: cambia el estado (si no se pasa, avanza al siguiente). */
   cambiarEstado(id: number, estado?: EstadoPedido): Observable<Pedido> {
     const body: CambiarEstadoRequest = { estado };
