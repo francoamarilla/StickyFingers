@@ -1,6 +1,6 @@
 # Architecture
 
-[Versión en español](../architecture.md) · [README](../../README.en.md)
+[Versión en español](../architecture.md) · [README](../../README.md)
 
 Sticky Fingers separates the public ordering experience from the administrative panel. Both consume the Spring Boot REST API; the panel also receives STOMP events.
 

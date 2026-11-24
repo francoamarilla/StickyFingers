@@ -1,6 +1,6 @@
 # Deployment and containerization
 
-[Versión en español](../deployment.md) · [README](../../README.en.md)
+[Versión en español](../deployment.md) · [README](../../README.md)
 
 The project contains multi-stage Dockerfiles for backend and frontend, and a Compose configuration for stack verification.
 

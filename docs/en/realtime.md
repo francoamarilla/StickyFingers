@@ -1,6 +1,6 @@
 # Real-time communication
 
-[Versión en español](../realtime.md) · [README](../../README.en.md)
+[Versión en español](../realtime.md) · [README](../../README.md)
 
 The backend uses Spring WebSocket, STOMP and a simple in-memory broker. Angular uses STOMP.js, SockJS, RxJS and Signals to receive events and update the panel.
 

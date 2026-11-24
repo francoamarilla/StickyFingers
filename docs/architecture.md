@@ -1,6 +1,6 @@
 # Arquitectura
 
-[English version](en/architecture.md) · [README](../README.md)
+[English version](en/architecture.md) · [README](../README.es.md)
 
 Sticky Fingers separa la experiencia pública de compra del panel administrativo. Ambos consumen la API REST de Spring Boot; el panel recibe además eventos mediante STOMP.
 

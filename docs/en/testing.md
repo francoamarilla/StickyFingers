@@ -1,6 +1,6 @@
 # Automated testing
 
-[Versión en español](../testing.md) · [README](../../README.en.md)
+[Versión en español](../testing.md) · [README](../../README.md)
 
 ## Scope
 

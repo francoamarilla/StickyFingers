@@ -1,6 +1,6 @@
 # Business rules
 
-[Versión en español](../business-rules.md) · [README](../../README.en.md)
+[Versión en español](../business-rules.md) · [README](../../README.md)
 
 ## Checkout
 

@@ -1,6 +1,6 @@
 # Despliegue y contenedorización
 
-[English version](en/deployment.md) · [README](../README.md)
+[English version](en/deployment.md) · [README](../README.es.md)
 
 El proyecto cuenta con Dockerfiles multi-stage para backend y frontend, y una configuración Compose de verificación del stack.
 

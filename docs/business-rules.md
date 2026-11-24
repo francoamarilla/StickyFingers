@@ -1,6 +1,6 @@
 # Reglas de negocio
 
-[English version](en/business-rules.md) · [README](../README.md)
+[English version](en/business-rules.md) · [README](../README.es.md)
 
 ## Checkout
 

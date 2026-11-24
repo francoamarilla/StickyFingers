@@ -1,6 +1,6 @@
 # Local setup
 
-[Versión en español](../setup.md) · [README](../../README.en.md)
+[Versión en español](../setup.md) · [README](../../README.md)
 
 Requirements: Docker with Compose, Java 21 and Node.js 22.22.3 or a later 22.x version compatible with Angular 22. The minimum version is noted in the frontend Dockerfile.
 

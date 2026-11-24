@@ -1,6 +1,6 @@
 # Pruebas automatizadas
 
-[English version](en/testing.md) · [README](../README.md)
+[English version](en/testing.md) · [README](../README.es.md)
 
 ## Alcance
 
