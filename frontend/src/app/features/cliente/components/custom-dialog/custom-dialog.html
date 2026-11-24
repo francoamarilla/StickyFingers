@@ -1,7 +1,7 @@
 <div class="dlg">
   <header>
     <h2 class="font-anton">{{ data.producto.nombre }}</h2>
-    <button type="button" class="close" (click)="cancelar()" aria-label="Cerrar">✕</button>
+    <button type="button" class="close" (click)="cancelar()" aria-label="Cerrar"><span class="material-icons" aria-hidden="true">close</span></button>
   </header>
 
   @if (data.producto.descripcion) {
@@ -11,19 +11,19 @@
   <section>
     <span class="label font-anton">CANTIDAD</span>
     <div class="stepper">
-      <button type="button" (click)="decrementar()" aria-label="Menos">–</button>
-      <span class="qty">{{ cantidad() }}</span>
-      <button type="button" (click)="incrementar()" aria-label="Más">+</button>
+      <button type="button" (click)="decrementar()" aria-label="Menos" [disabled]="cantidad() <= 1"><span class="material-icons" aria-hidden="true">remove</span></button>
+      <span class="qty" aria-live="polite">{{ cantidad() }}</span>
+      <button type="button" (click)="incrementar()" aria-label="Más" [disabled]="enMaximo()"><span class="material-icons" aria-hidden="true">add</span></button>
     </div>
     @if (enMaximo()) {
-      <p class="hint">Llegaste al máximo de hamburguesas del pedido</p>
+      <p class="hint" role="status">Llegaste al máximo de hamburguesas del pedido</p>
     }
   </section>
 
   <section>
     <span class="label font-anton">EXTRA</span>
-    <button type="button" class="medallon" [class.on]="medallonExtra()" (click)="toggleMedallon()">
-      <span class="check">{{ medallonExtra() ? '✓' : '' }}</span>
+    <button type="button" class="medallon" [class.on]="medallonExtra()" [attr.aria-pressed]="medallonExtra()" (click)="toggleMedallon()">
+      <span class="check">@if (medallonExtra()) { <span class="material-icons" aria-hidden="true">check</span> }</span>
       <span class="txt">
         <strong>Medallón extra</strong>
         <small>Doble carne en esta hamburguesa</small>
@@ -33,8 +33,10 @@
   </section>
 
   <section>
-    <span class="label font-anton">ACLARACIÓN</span>
+    <label class="label font-anton" for="nota-linea">ACLARACIÓN</label>
     <textarea
+      id="nota-linea"
+      maxlength="200"
       rows="2"
       placeholder="Ej: sin tomate, cortada al medio, poca sal…"
       [ngModel]="nota()"

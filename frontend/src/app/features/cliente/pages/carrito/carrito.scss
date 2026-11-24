@@ -25,7 +25,8 @@
     background: var(--sticky-surface-2);
     border: 1px solid var(--sticky-border);
     color: var(--sticky-cream);
-    font-size: 24px;
+    display: grid;
+    place-items: center;
     cursor: pointer;
   }
   h1 { margin: 0; font-size: 23px; }
@@ -76,7 +77,18 @@ main { flex: 1; padding: 16px; }
     align-items: flex-start;
     gap: 10px;
     h3 { margin: 0; font-size: 17px; text-transform: uppercase; }
-    .x { background: none; border: none; color: var(--sticky-dim); font-size: 15px; cursor: pointer; }
+    .x {
+      background: none;
+      border: none;
+      color: var(--sticky-muted);
+      width: 40px;
+      height: 40px;
+      margin: -10px -10px 0 0;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      &:hover { color: var(--sticky-red-text); }
+    }
   }
 
   .row2 {
@@ -94,7 +106,8 @@ main { flex: 1; padding: 16px; }
     border: 1px solid var(--sticky-border);
     border-radius: 11px;
     overflow: hidden;
-    button { width: 36px; height: 36px; background: none; border: none; color: var(--sticky-cream); font-size: 20px; cursor: pointer; }
+    button { width: 40px; height: 40px; background: none; border: none; color: var(--sticky-cream); display: grid; place-items: center; cursor: pointer; }
+    .material-icons { font-size: 20px; }
     .qty { min-width: 26px; text-align: center; font-weight: 700; font-size: 16px; color: var(--sticky-yellow); }
   }
 
@@ -135,5 +148,9 @@ main { flex: 1; padding: 16px; }
     padding: 17px;
     font-size: 19px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
 }

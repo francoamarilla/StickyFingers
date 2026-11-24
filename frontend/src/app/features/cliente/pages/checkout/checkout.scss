@@ -24,7 +24,8 @@
     background: var(--sticky-surface-2);
     border: 1px solid var(--sticky-border);
     color: var(--sticky-cream);
-    font-size: 24px;
+    display: grid;
+    place-items: center;
     cursor: pointer;
   }
   h1 { margin: 0; font-size: 23px; }
@@ -32,7 +33,7 @@
 
 main { flex: 1; padding: 18px 16px; display: flex; flex-direction: column; gap: 22px; }
 
-.label { color: var(--sticky-red); font-size: 15px; letter-spacing: 1px; margin: 0 0 10px; }
+.label { color: var(--sticky-red-text); font-size: 15px; letter-spacing: 1px; margin: 0 0 10px; }
 
 .in {
   width: 100%;
@@ -70,7 +71,7 @@ main { flex: 1; padding: 18px 16px; display: flex; flex-direction: column; gap: 
 
 .hint { margin: 8px 0 0; font-size: 12.5px; color: var(--sticky-muted); }
 
-.nota-pago { margin: 8px 0 0; font-size: 12px; color: var(--sticky-dim); }
+.nota-pago { margin: 8px 0 0; font-size: 12.5px; color: var(--sticky-muted); }
 
 .resumen {
   background: var(--sticky-surface);
@@ -86,8 +87,9 @@ main { flex: 1; padding: 18px 16px; display: flex; flex-direction: column; gap: 
 .barra {
   position: sticky;
   bottom: 0;
-  padding: 14px 16px 18px;
-  background: linear-gradient(0deg, var(--sticky-bg) 72%, transparent);
+  padding: 28px 16px 18px;
+  background: linear-gradient(0deg, var(--sticky-bg) 82%, transparent);
+  .faltante { margin: 0 0 10px; text-align: center; font-size: 13px; color: var(--sticky-muted); }
   .cta {
     width: 100%;
     border: none;
@@ -97,6 +99,6 @@ main { flex: 1; padding: 18px 16px; display: flex; flex-direction: column; gap: 
     cursor: pointer;
     background: var(--sticky-yellow);
     color: var(--sticky-bg);
-    &:disabled { background: #2a2723; color: var(--sticky-dim); cursor: not-allowed; }
+    &:disabled { background: #2a2723; color: var(--sticky-muted); cursor: not-allowed; }
   }
 }

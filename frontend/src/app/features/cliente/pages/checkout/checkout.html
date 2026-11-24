@@ -1,41 +1,41 @@
 <div class="page">
   <header class="topbar">
-    <button type="button" class="back" (click)="volver()" aria-label="Volver">‹</button>
+    <button type="button" class="back" (click)="volver()" aria-label="Volver al pedido"><span class="material-icons" aria-hidden="true">arrow_back</span></button>
     <h1 class="font-anton">FINALIZAR</h1>
   </header>
 
   <main>
     <section>
       <h2 class="label font-anton">TUS DATOS</h2>
-      <input class="in" placeholder="Nombre y apellido" [ngModel]="nombre()" (ngModelChange)="nombre.set($event)" />
-      <input class="in" inputmode="numeric" placeholder="Teléfono / WhatsApp" [ngModel]="telefono()" (ngModelChange)="telefono.set($event)" />
+      <input class="in" aria-label="Nombre y apellido" autocomplete="name" maxlength="120" placeholder="Nombre y apellido" [ngModel]="nombre()" (ngModelChange)="nombre.set($event)" />
+      <input class="in" type="tel" aria-label="Teléfono o WhatsApp" autocomplete="tel" maxlength="40" placeholder="Teléfono / WhatsApp" [ngModel]="telefono()" (ngModelChange)="telefono.set($event)" />
     </section>
 
     <section>
       <h2 class="label font-anton">ENTREGA</h2>
-      <div class="seg">
-        <button type="button" [class.on]="!esDelivery()" (click)="setEntrega('RETIRO')">Retiro en local</button>
-        <button type="button" [class.on]="esDelivery()" (click)="setEntrega('DELIVERY')">Delivery</button>
+      <div class="seg" role="group" aria-label="Tipo de entrega">
+        <button type="button" [class.on]="!esDelivery()" [attr.aria-pressed]="!esDelivery()" (click)="setEntrega('RETIRO')">Retiro en local</button>
+        <button type="button" [class.on]="esDelivery()" [attr.aria-pressed]="esDelivery()" (click)="setEntrega('DELIVERY')">Delivery</button>
       </div>
 
       @if (esDelivery()) {
-        <input class="in" placeholder="Calle y numeración, piso y depto (ej.: Av. Colón 1234, piso 3, depto B)" autocomplete="off" [ngModel]="direccion()" (ngModelChange)="direccion.set($event)" />
+        <input class="in" aria-label="Dirección de entrega" maxlength="200" placeholder="Calle, número, piso y depto" autocomplete="street-address" [ngModel]="direccion()" (ngModelChange)="direccion.set($event)" />
         <p class="hint">El costo de envío lo coordina el local con vos.</p>
       }
     </section>
 
     <section>
       <h2 class="label font-anton">PAGO</h2>
-      <div class="seg">
-        <button type="button" [class.on]="medioPago() === 'EFECTIVO'" (click)="setPago('EFECTIVO')">Efectivo</button>
-        <button type="button" [class.on]="medioPago() === 'TRANSFERENCIA'" (click)="setPago('TRANSFERENCIA')">Transferencia</button>
+      <div class="seg" role="group" aria-label="Medio de pago">
+        <button type="button" [class.on]="medioPago() === 'EFECTIVO'" [attr.aria-pressed]="medioPago() === 'EFECTIVO'" (click)="setPago('EFECTIVO')">Efectivo</button>
+        <button type="button" [class.on]="medioPago() === 'TRANSFERENCIA'" [attr.aria-pressed]="medioPago() === 'TRANSFERENCIA'" (click)="setPago('TRANSFERENCIA')">Transferencia</button>
       </div>
       <p class="nota-pago">Sin recargo por medio de pago.</p>
     </section>
 
     <section>
       <h2 class="label font-anton">NOTA GENERAL</h2>
-      <textarea class="in" rows="2" placeholder="Horario deseado, referencias del domicilio, etc." [ngModel]="notaGeneral()" (ngModelChange)="notaGeneral.set($event)"></textarea>
+      <textarea class="in" rows="2" aria-label="Nota general" maxlength="500" placeholder="Horario deseado, referencias del domicilio, etc." [ngModel]="notaGeneral()" (ngModelChange)="notaGeneral.set($event)"></textarea>
     </section>
 
     <div class="resumen">
@@ -51,6 +51,9 @@
   </main>
 
   <footer class="barra">
+    @if (faltante(); as f) {
+      <p class="faltante" role="status">{{ f }}</p>
+    }
     <button type="button" class="cta font-anton" [disabled]="!puedeConfirmar()" (click)="confirmar()">
       {{ enviando() ? 'ENVIANDO…' : 'CONFIRMAR PEDIDO · ' + (total() | money) }}
     </button>

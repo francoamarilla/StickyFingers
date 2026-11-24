@@ -1,16 +1,16 @@
 <div class="login">
   <form class="card" (ngSubmit)="ingresar()">
-    <img src="logo.png" alt="Sticky Burgers" class="logo" />
+    <img ngSrc="logo-192.png" width="124" height="124" priority alt="Sticky Burgers" class="logo" />
     <h1 class="font-anton">PANEL DEL LOCAL</h1>
     <p class="sub">Acceso exclusivo del administrador</p>
 
-    <input class="in" placeholder="Usuario" autocomplete="username"
+    <input class="in" aria-label="Usuario" placeholder="Usuario" autocomplete="username"
       [ngModel]="username()" (ngModelChange)="username.set($event)" name="username" />
-    <input class="in" type="password" placeholder="Contraseña" autocomplete="current-password"
+    <input class="in" type="password" aria-label="Contraseña" placeholder="Contraseña" autocomplete="current-password"
       [ngModel]="password()" (ngModelChange)="password.set($event)" name="password" />
 
     @if (error()) {
-      <p class="error">{{ error() }}</p>
+      <p class="error" role="alert">{{ error() }}</p>
     }
 
     <button type="submit" class="cta font-anton" [disabled]="enviando()">

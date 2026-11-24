@@ -1,10 +1,10 @@
 <form class="editor" (ngSubmit)="guardar()">
   <h2 class="font-anton">{{ editandoId() ? 'EDITAR OFERTA' : 'NUEVA OFERTA' }}</h2>
-  <input class="in" placeholder="Título" name="titulo" [ngModel]="titulo()" (ngModelChange)="titulo.set($event)" />
-  <textarea class="in" rows="2" placeholder="Descripción" name="descripcion" [ngModel]="descripcion()" (ngModelChange)="descripcion.set($event)"></textarea>
+  <input class="in" aria-label="Título" placeholder="Título" name="titulo" [ngModel]="titulo()" (ngModelChange)="titulo.set($event)" />
+  <textarea class="in" rows="2" aria-label="Descripción" placeholder="Descripción" name="descripcion" [ngModel]="descripcion()" (ngModelChange)="descripcion.set($event)"></textarea>
   <div class="fila">
-    <input class="in" type="text" inputmode="numeric" placeholder="Precio (ej. $18.000)" name="precio" [ngModel]="precioTexto()" (ngModelChange)="onPrecio($event)" />
-    <input class="in" placeholder="Vigencia (ej: Solo hoy)" name="vigencia" [ngModel]="vigencia()" (ngModelChange)="vigencia.set($event)" />
+    <input class="in" type="text" inputmode="numeric" aria-label="Precio" placeholder="Precio (ej. $18.000)" name="precio" [ngModel]="precioTexto()" (ngModelChange)="onPrecio($event)" />
+    <input class="in" aria-label="Vigencia" placeholder="Vigencia (ej: Solo hoy)" name="vigencia" [ngModel]="vigencia()" (ngModelChange)="vigencia.set($event)" />
   </div>
   <label class="chk">
     <input type="checkbox" name="activa" [ngModel]="activa()" (ngModelChange)="activa.set($event)" />

@@ -1,10 +1,10 @@
 @if (pedido(); as p) {
   <div class="page">
     <main>
-      <div class="check">✓</div>
-      <h1 class="font-anton">¡PEDIDO LISTO!</h1>
+      <div class="check"><span class="material-icons" aria-hidden="true">check</span></div>
+      <h1 class="font-anton">¡PEDIDO REGISTRADO!</h1>
       <p class="sub">
-        Tu pedido <b>{{ p.numero }}</b> quedó registrado. Enviálo por WhatsApp para confirmarlo con el local.
+        Tu pedido <b>{{ p.numero }}</b> quedó registrado. Envialo por WhatsApp para confirmarlo con el local.
       </p>
 
       <div class="resumen">

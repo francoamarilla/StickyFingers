@@ -1,11 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { NgOptimizedImage } from '@angular/common';
 import { AuthService } from '../../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule],
+  imports: [FormsModule, NgOptimizedImage],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })

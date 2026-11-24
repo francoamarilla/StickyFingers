@@ -1,6 +1,8 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { NgOptimizedImage } from '@angular/common';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { catchError, of, startWith, switchMap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { MenuService } from '../../../../core/services/menu.service';
 import { OfertaService } from '../../../../core/services/oferta.service';
@@ -17,7 +19,7 @@ import {
 
 @Component({
   selector: 'app-carta',
-  imports: [MoneyPipe],
+  imports: [MoneyPipe, NgOptimizedImage],
   templateUrl: './carta.html',
   styleUrl: './carta.scss',
 })
@@ -30,11 +32,30 @@ export class Carta {
 
   readonly maxHamburguesas = MAX_HAMBURGUESAS;
 
-  private readonly productos = toSignal(this.menuService.listar(), { initialValue: [] as Producto[] });
+  private readonly recarga = signal(0);
+
+  /** undefined = cargando, null = error, array = carta cargada. */
+  private readonly productos = toSignal(
+    toObservable(this.recarga).pipe(
+      switchMap(() =>
+        this.menuService.listar().pipe(
+          catchError(() => of(null)),
+          startWith(undefined),
+        ),
+      ),
+    ),
+  );
+
+  readonly cargando = computed(() => this.productos() === undefined);
+  readonly error = computed(() => this.productos() === null);
 
   readonly ofertas = toSignal(this.ofertaService.listarActivas(), { initialValue: [] as Oferta[] });
-  readonly hamburguesas = computed(() => this.productos().filter((p) => p.tipo === 'HAMBURGUESA'));
-  readonly extras = computed(() => this.productos().filter((p) => p.tipo === 'EXTRA'));
+  readonly hamburguesas = computed(() => (this.productos() ?? []).filter((p) => p.tipo === 'HAMBURGUESA'));
+  readonly extras = computed(() => (this.productos() ?? []).filter((p) => p.tipo === 'EXTRA'));
+
+  reintentar(): void {
+    this.recarga.update((n) => n + 1);
+  }
 
   cantidadEnPedido(producto: Producto): number {
     return this.cart

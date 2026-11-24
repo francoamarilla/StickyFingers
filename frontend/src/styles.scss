@@ -20,10 +20,11 @@ html {
   --sticky-surface: #161311;
   --sticky-surface-2: #1a1613;
   --sticky-red: #e11b22;
+  --sticky-red-text: #ef3a3f; // rojo para texto chico: 4.5:1 sobre las superficies
   --sticky-yellow: #ffc400;
   --sticky-cream: #f3ece0;
   --sticky-muted: #9a9186;
-  --sticky-dim: #6f6860;
+  --sticky-dim: #8a8278; // ≥4.5:1 sobre todas las superficies
   --sticky-border: rgba(255, 255, 255, 0.08);
   --sticky-green: #39b34a;
 }
@@ -41,9 +42,54 @@ body {
   box-sizing: border-box;
 }
 
+/* Los controles nativos no heredan la fuente: sin esto los botones salen en Arial. */
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sticky-yellow);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--sticky-red);
+  color: #fff;
+}
+
+input,
+textarea {
+  caret-color: var(--sticky-yellow);
+}
+
+::placeholder {
+  color: var(--sticky-muted);
+  opacity: 1;
+}
+
+/* Precios y cantidades alineados en columnas. */
+.precio,
+.monto,
+.total,
+.qty {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Anton solo tiene peso 400: evita la negrita sintética que embarra los títulos. */
 .font-anton {
   font-family: 'Anton', sans-serif;
+  font-weight: 400;
+  font-synthesis: none;
   letter-spacing: 0.5px;
+}
+
+.material-icons {
+  font-size: 22px;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 /* Diálogo de Material con fondo oscuro de marca */

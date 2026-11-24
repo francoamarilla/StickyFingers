@@ -34,6 +34,12 @@ export interface Pedido {
   items: ItemPedido[];
 }
 
+/** Evento STOMP mínimo (sin datos personales); el detalle se pide por REST. */
+export interface PedidoEvento {
+  id: number;
+  estado: EstadoPedido;
+}
+
 export interface ItemPedidoRequest {
   /** Producto del menú (excluyente con ofertaId). */
   productoId?: number | null;

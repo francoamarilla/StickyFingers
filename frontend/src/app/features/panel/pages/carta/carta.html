@@ -1,14 +1,14 @@
 <form class="editor" (ngSubmit)="guardar()">
   <h2 class="font-anton">{{ editandoId() ? 'EDITAR PRODUCTO' : 'NUEVO PRODUCTO' }}</h2>
   <div class="fila">
-    <select class="in" name="tipo" [ngModel]="tipo()" (ngModelChange)="tipo.set($event)">
+    <select class="in" aria-label="Tipo de producto" name="tipo" [ngModel]="tipo()" (ngModelChange)="tipo.set($event)">
       <option value="HAMBURGUESA">Hamburguesa</option>
       <option value="EXTRA">Extra</option>
     </select>
-    <input class="in" placeholder="Nombre" name="nombre" [ngModel]="nombre()" (ngModelChange)="nombre.set($event)" />
+    <input class="in" aria-label="Nombre" placeholder="Nombre" name="nombre" [ngModel]="nombre()" (ngModelChange)="nombre.set($event)" />
   </div>
-  <textarea class="in" rows="2" placeholder="Descripción" name="descripcion" [ngModel]="descripcion()" (ngModelChange)="descripcion.set($event)"></textarea>
-  <input class="in" type="text" inputmode="numeric" placeholder="Precio (ej. $8.000)" name="precio" [ngModel]="precioTexto()" (ngModelChange)="onPrecio($event)" />
+  <textarea class="in" rows="2" aria-label="Descripción" placeholder="Descripción" name="descripcion" [ngModel]="descripcion()" (ngModelChange)="descripcion.set($event)"></textarea>
+  <input class="in" type="text" inputmode="numeric" aria-label="Precio" placeholder="Precio (ej. $8.000)" name="precio" [ngModel]="precioTexto()" (ngModelChange)="onPrecio($event)" />
   <label class="chk">
     <input type="checkbox" name="disponible" [ngModel]="disponible()" (ngModelChange)="disponible.set($event)" />
     Visible en el menú
